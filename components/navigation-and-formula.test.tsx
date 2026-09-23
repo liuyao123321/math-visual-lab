@@ -15,6 +15,7 @@ describe("navigation and formula accessibility", () => {
     expect(screen.getAllByRole("link", { name: "错题集" })[0]).toHaveAttribute("href", "/mistakes");
     expect(screen.getAllByRole("link", { name: "学习报告" })[0]).toHaveAttribute("href", "/report");
     expect(screen.getAllByRole("link", { name: "设置" })[0]).toHaveAttribute("href", "/settings");
+    expect(screen.getAllByRole("link", { name: "智能答疑" })[0].tagName).toBe("A");
   });
 
   it("renders a valid final answer with KaTeX", () => {
