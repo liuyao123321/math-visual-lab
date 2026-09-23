@@ -81,11 +81,16 @@ export const practiceResultSchema = z.object({
 });
 export type PracticeResult = z.infer<typeof practiceResultSchema>;
 
+const imageDataUrlSchema = z.string()
+  .max(12_000_000)
+  .regex(/^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/, "图片格式不受支持");
+
 export const tutorRequestSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("solve"),
-    question: z.string().trim().min(3).max(2000),
+    question: z.string().trim().max(2000),
     mode: explanationModeSchema,
+    imageDataUrl: imageDataUrlSchema.optional(),
   }),
   z.object({
     action: z.literal("explain-step"),
@@ -100,7 +105,11 @@ export const tutorRequestSchema = z.discriminatedUnion("action", [
     topics: z.array(z.string().min(1).max(40)).min(1).max(8),
     difficulty: z.enum(["基础", "中等", "进阶"]),
   }),
-]);
+]).superRefine((value, context) => {
+  if (value.action === "solve" && value.question.length < 3 && !value.imageDataUrl) {
+    context.addIssue({ code: "custom", path: ["question"], message: "请输入题目或上传题目图片" });
+  }
+});
 export type TutorRequest = z.infer<typeof tutorRequestSchema>;
 
 export const masterySchema = z.enum(["unreviewed", "reviewing", "mastered"]);

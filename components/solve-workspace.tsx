@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { AlertCircle, ArrowRight, BookOpenCheck, BrainCircuit, Check, FlaskConical, Lightbulb, Loader2, Save, Sparkles } from "lucide-react";
+import { AlertCircle, ArrowRight, BookOpenCheck, BrainCircuit, Camera, Check, FlaskConical, Lightbulb, Loader2, Save, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +24,8 @@ import { cn } from "@/lib/utils";
 
 const modeLabels: Record<ExplanationMode, string> = { concise: "简洁", detailed: "详细", visual: "可视化" };
 const reasons = ["概念没有理解", "公式不会使用", "计算过程出错", "图像与公式联系不清", "其他"];
+const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const maxImageBytes = 8 * 1024 * 1024;
 
 export function SolveWorkspace() {
   const searchParams = useSearchParams();
@@ -38,6 +40,7 @@ export function SolveWorkspace() {
   const mistakeId = searchParams.get("mistake");
   const customQuestion = searchParams.get("question");
   const practicedRef = useRef<string | null>(null);
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
   const initial = (requestedExample && exampleById[requestedExample]) || (mistakeId && mistakes.find((item) => item.id === mistakeId)?.solution) || storeSolution || examples[0];
   const [question, setQuestion] = useState(customQuestion || initial.normalizedQuestion);
   const [solution, setSolution] = useState<SolveResult>(initial);
@@ -54,6 +57,7 @@ export function SolveWorkspace() {
   const [practice, setPractice] = useState<PracticeResult | null>(null);
   const [secondaryLoading, setSecondaryLoading] = useState<"detail" | "practice" | "">("");
   const [hasKey, setHasKey] = useState(false);
+  const [photo, setPhoto] = useState<{ dataUrl: string; name: string; size: number } | null>(null);
 
   useEffect(() => {
     const update = () => setHasKey(Boolean(getApiKey()));
@@ -85,15 +89,18 @@ export function SolveWorkspace() {
 
   async function solve() {
     const trimmed = question.trim();
-    if (trimmed.length < 3) { setError("请输入完整的数学题目。"); return; }
+    if (trimmed.length < 3 && !photo) { setError("请输入完整的数学题目，或拍照上传题目。"); return; }
     setLoading(true); setError(""); setDetail(null); setPractice(null);
     try {
-      const result = await callTutor({ action: "solve", question: trimmed, mode }) as SolveResult;
+      const result = await callTutor({ action: "solve", question: trimmed, mode, imageDataUrl: photo?.dataUrl }) as SolveResult;
       setSolution(result);
+      setQuestion(result.normalizedQuestion);
       setStoreSolution(result);
       setParameters(defaultParameterValues(result.visualization));
       setActiveStep(0);
       setMobileView("steps");
+      setPhoto(null);
+      if (photoInputRef.current) photoInputRef.current.value = "";
       toast.success("解析已生成");
     } catch (caught) {
       setError(caught instanceof TutorError ? caught.message : "解析失败，请稍后重试。");
@@ -106,7 +113,44 @@ export function SolveWorkspace() {
     setStoreSolution(example);
     setParameters(defaultParameterValues(example.visualization));
     setActiveStep(0); setDetail(null); setPractice(null); setError("");
+    setPhoto(null);
+    if (photoInputRef.current) photoInputRef.current.value = "";
     window.history.replaceState(null, "", "/solve?example=" + example.id);
+  }
+
+  function choosePhoto() {
+    photoInputRef.current?.click();
+  }
+
+  function removePhoto() {
+    setPhoto(null);
+    if (photoInputRef.current) photoInputRef.current.value = "";
+  }
+
+  function handlePhoto(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!acceptedImageTypes.includes(file.type)) {
+      setError("仅支持 JPG、PNG、WebP 或 GIF 图片。");
+      event.target.value = "";
+      return;
+    }
+    if (file.size > maxImageBytes) {
+      setError("图片不能超过 8 MB，请压缩或裁剪后重试。");
+      event.target.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== "string") {
+        setError("图片读取失败，请重新选择。");
+        return;
+      }
+      setPhoto({ dataUrl: reader.result, name: file.name, size: file.size });
+      setError("");
+    };
+    reader.onerror = () => setError("图片读取失败，请重新选择。");
+    reader.readAsDataURL(file);
   }
 
   async function explainStep() {
@@ -152,13 +196,30 @@ export function SolveWorkspace() {
           <CardHeader className="border-b py-4"><CardTitle className="flex items-center gap-2 text-base"><BookOpenCheck className="size-4 text-cyan-500" />题目输入</CardTitle></CardHeader>
           <CardContent className="space-y-4 p-5">
             <Textarea value={question} onChange={(event) => setQuestion(event.target.value)} className="min-h-36 resize-none text-base leading-7" aria-label="数学题目" placeholder="例如：求函数 f(x)=x²-4x+3 的零点与顶点。" />
+            <input ref={photoInputRef} className="sr-only" type="file" accept="image/jpeg,image/png,image/webp,image/gif" capture="environment" onChange={handlePhoto} aria-label="拍照或选择数学题图片" />
+            {photo ? (
+              <div className="overflow-hidden rounded-xl border border-cyan-500/30 bg-cyan-500/[0.05]">
+                <div className="relative aspect-[16/9] bg-slate-950/5 dark:bg-slate-950/40">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={photo.dataUrl} alt="待识别题目预览" className="size-full object-contain" />
+                  <Button type="button" variant="secondary" size="icon" className="absolute right-2 top-2 size-8 rounded-full" onClick={removePhoto} aria-label="移除题目图片"><X /></Button>
+                </div>
+                <div className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
+                  <span className="min-w-0 truncate text-muted-foreground">{photo.name}</span>
+                  <span className="shrink-0 text-cyan-700 dark:text-cyan-300">{(photo.size / 1024 / 1024).toFixed(1)} MB</span>
+                </div>
+              </div>
+            ) : (
+              <Button type="button" variant="outline" className="w-full border-dashed" onClick={choosePhoto}><Camera />拍照 / 选择题目图片</Button>
+            )}
+            <p className="-mt-2 text-xs leading-5 text-muted-foreground">支持 JPG、PNG、WebP、GIF，最大 8 MB。原图仅用于本次识别，不会保存到错题集。</p>
             <div>
               <p className="mb-2 text-sm text-muted-foreground">解析方式</p>
               <Tabs value={mode} onValueChange={(value) => setMode(value as ExplanationMode)}>
                 <TabsList className="grid w-full grid-cols-3">{Object.entries(modeLabels).map(([value, label]) => <TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}</TabsList>
               </Tabs>
             </div>
-            <Button size="lg" className="w-full" onClick={solve} disabled={loading}>{loading ? <><Loader2 className="animate-spin" />正在分析题目</> : <>开始解析<ArrowRight /></>}</Button>
+            <Button size="lg" className="w-full" onClick={solve} disabled={loading}>{loading ? <><Loader2 className="animate-spin" />{photo ? "正在识别并解析" : "正在分析题目"}</> : <>{photo ? "识别并解析" : "开始解析"}<ArrowRight /></>}</Button>
             <div className="border-t pt-4">
               <p className="mb-2 text-sm font-medium">离线演示题</p>
               <div className="space-y-2">{examples.map((example) => <Button key={example.id} variant={example.id === solution.id ? "secondary" : "outline"} className="h-auto w-full justify-start py-3 text-left whitespace-normal" onClick={() => loadExample(example)}><FlaskConical className="shrink-0 text-cyan-500" /><span><span className="block text-sm font-medium">{example.questionType}</span><span className="line-clamp-1 text-xs text-muted-foreground">{example.normalizedQuestion}</span></span></Button>)}</div>

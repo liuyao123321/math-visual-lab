@@ -29,6 +29,26 @@ describe("POST /api/tutor", () => {
     expect(payload.data.id).not.toBe(examples[0].id);
   });
 
+  it("sends an uploaded question image as a vision input", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      choices: [{ message: { content: JSON.stringify(examples[0]) } }],
+    }), { status: 200, headers: { "Content-Type": "application/json" } }));
+    vi.stubGlobal("fetch", fetchMock);
+    const imageDataUrl = "data:image/png;base64,iVBORw0KGgo=";
+    const request = new NextRequest("http://localhost/api/tutor", {
+      method: "POST",
+      headers: { Authorization: "Bearer sk-demo", "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "solve", question: "", mode: "visual", imageDataUrl }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const upstreamBody = JSON.parse(fetchMock.mock.calls[0][1].body as string);
+    expect(upstreamBody.messages[1].content).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: "image_url", image_url: { url: imageDataUrl, detail: "original" } }),
+    ]));
+  });
+
   it("maps an upstream authentication failure", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("unauthorized", { status: 401 })));
     const request = new NextRequest("http://localhost/api/tutor", {

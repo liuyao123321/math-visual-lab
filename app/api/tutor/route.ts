@@ -18,7 +18,15 @@ const RESPONSE_SHAPES = {
   "similar-practice": '{"question":"练习题","hint":"分层提示","answerLatex":"LaTeX 答案","topics":["知识点"],"difficulty":"基础|中等|进阶"}',
 } as const;
 
-function buildMessages(request: TutorRequest) {
+type DeepSeekMessage = {
+  role: "system" | "user" | "assistant";
+  content: string | Array<
+    | { type: "text"; text: string }
+    | { type: "image_url"; image_url: { url: string; detail: "original" } }
+  >;
+};
+
+function buildMessages(request: TutorRequest): DeepSeekMessage[] {
   const common = [
     "你是一位严谨的大学数学助教。只能输出合法 JSON，禁止输出 Markdown 代码围栏或额外说明。",
     "数学结论不确定、条件不足或超出能力时必须明确标记，不能编造。",
@@ -30,9 +38,25 @@ function buildMessages(request: TutorRequest) {
   ].join("\n");
 
   if (request.action === "solve") {
+    const prompt = request.imageDataUrl
+      ? [
+          "请先准确识别图片中的完整数学题，再按要求求解。",
+          "若图片模糊、题目被裁切、符号无法辨认或条件不完整，不要猜测；请将 status 设为 needs_more_info，并在 limitations 中说明需要用户补充什么。",
+          "解析模式：" + request.mode + "。",
+          request.question ? "用户补充说明：" + request.question : "用户没有补充文字说明。",
+        ].join("\n")
+      : "解析模式：" + request.mode + "。题目：" + request.question;
     return [
       { role: "system", content: common },
-      { role: "user", content: "解析模式：" + request.mode + "。题目：" + request.question },
+      {
+        role: "user",
+        content: request.imageDataUrl
+          ? [
+              { type: "text", text: prompt },
+              { type: "image_url", image_url: { url: request.imageDataUrl, detail: "original" } },
+            ]
+          : prompt,
+      },
     ];
   }
   if (request.action === "explain-step") {
@@ -55,7 +79,7 @@ class ValidationError extends Error {
   constructor(message: string, public raw: string) { super(message); }
 }
 
-async function deepSeekJson(apiKey: string, messages: Array<{ role: string; content: string }>) {
+async function deepSeekJson(apiKey: string, messages: DeepSeekMessage[]) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 30_000);
   try {
