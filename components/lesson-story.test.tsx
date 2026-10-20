@@ -7,6 +7,7 @@ import type { VisualizationSpec } from "@/lib/math-schema";
 
 type Trigger = { pin?: HTMLElement; onEnter?: () => void; onEnterBack?: () => void; onUpdate?: (self: { isActive: boolean }) => void };
 const engine = vi.hoisted(() => ({ triggers: [] as Trigger[], kill: vi.fn(), refresh: vi.fn(), wide: true }));
+// eslint-disable-next-line react-hooks/exhaustive-deps -- Test adapter forwards the GSAP hook's dependency contract.
 vi.mock("@gsap/react", () => ({ useGSAP: (callback: () => void | (() => void), options: { dependencies: unknown[] }) => useLayoutEffect(callback, options.dependencies) }));
 vi.mock("gsap", () => ({ gsap: {
   registerPlugin: vi.fn(),
@@ -37,7 +38,7 @@ describe("shared lesson canvas (mock animation engine)", () => {
     expect(screen.getAllByTestId("story-plot")).toHaveLength(1);
     expect(screen.getByTestId("story-plot")).toHaveAttribute("data-layers", "function");
     expect(screen.queryByRole("slider")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "观察切线", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "观察切线" }));
     expect(screen.getAllByTestId("story-plot")).toHaveLength(1);
     expect(screen.getByRole("region", { name: "当前步骤可视化" })).toHaveAttribute("data-active-step", "d4");
     expect(screen.getByTestId("story-plot")).toHaveAttribute("data-layers", "function,tangent,moving-point");
@@ -51,14 +52,14 @@ describe("shared lesson canvas (mock animation engine)", () => {
     fireEvent.wheel(window);
     act(() => tracker.onEnter?.());
     expect(screen.getByRole("region", { name: "当前步骤可视化" })).toHaveAttribute("data-active-step", "d2");
-    fireEvent.click(screen.getByRole("button", { name: "观察切线", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "观察切线" }));
     act(() => tracker.onEnter?.());
     expect(screen.getByRole("region", { name: "当前步骤可视化" })).toHaveAttribute("data-active-step", "d4");
   });
   it("does not unlock or leak future graphs, and cleans up its own pins", () => {
     const page = render(<Story count={1} />);
     expect(screen.getByRole("button", { name: "回看下一已展开步骤图像" })).toBeDisabled();
-    expect(screen.queryByRole("button", { name: "观察切线", exact: true })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "观察切线" })).not.toBeInTheDocument();
     expect(screen.queryByText(/极值点/)).not.toBeInTheDocument();
     page.unmount(); expect(engine.kill).toHaveBeenCalledTimes(2);
   });

@@ -47,6 +47,7 @@ export function createPlotTraces(spec: VisualizationSpec, parameters: Record<str
       const x = validPoints.map((point) => point.x);
       const y = validPoints.map((point) => point.y);
       const trace: PlotTrace = {
+        uid: layer.id,
         x: layer.type === "area" ? [...x, x[x.length - 1], x[0]] : sampled.x,
         y: layer.type === "area" ? [...y, 0, 0] : sampled.y,
         type: "scatter",
@@ -71,6 +72,7 @@ export function createPlotTraces(spec: VisualizationSpec, parameters: Record<str
       const x = coordinates.map((point) => point.x);
       const y = coordinates.map((point) => point.y);
       traces.push({
+        uid: layer.id,
         x, y, type: "scatter", mode: layer.type === "line" ? "lines" : "markers+text",
         text: layer.type === "points" ? coordinates.map((point) => `(${Number(point.x.toFixed(3))}, ${Number(point.y.toFixed(3))})`) : undefined,
         textposition: "top center",

@@ -56,6 +56,7 @@ h1, h2, h3, [data-slot="card-title"] { font-family: var(--font-editorial); text-
 .story-step-title:hover { color: var(--foreground); }
 .story-step-title:focus-visible { outline: 2px solid var(--ring); border-radius: 3px; }
 .lesson-story, .story-steps, .story-canvas-slot { min-width: 0; }
+.lesson-story:not(.lesson-story--shared) .story-steps { max-width: 54rem; }
 .story-canvas { border: 1px solid var(--border); border-radius: 1.2rem; background: var(--card); max-height: calc(100dvh - var(--site-header-offset) - 40px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .story-canvas-header { padding: 1.25rem 1.25rem .8rem; border-bottom: 1px solid var(--border); }
 .story-canvas-navigation { display: flex; justify-content: flex-end; gap: .25rem; margin-top: .4rem; }
