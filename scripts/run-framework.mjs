@@ -5,6 +5,10 @@ import { readExecutionProfile } from "./execution-profile.mjs";
 const [command, ...args] = process.argv.slice(2);
 if (!["dev", "build"].includes(command)) throw new Error("Expected dev or build.");
 const managedLinux = readExecutionProfile() === "managed-linux";
+if (command === "dev" && !managedLinux) {
+  const { startRagRuntime } = await import("./rag-runtime.mjs");
+  await startRagRuntime({ waitForReady: false });
+}
 
 if (managedLinux && command === "build") {
   const result = spawnSync("bash", [

@@ -1,0 +1,1527 @@
+{
+  "measuredAtUTC": "2026-10-17T07:09:11.602274+00:00",
+  "split": "test",
+  "scope": "retrieval only; no generated-answer accuracy measurement",
+  "summary": {
+    "text": {
+      "cases": 30,
+      "meanRecallAt4": 0.963,
+      "coverageAccuracy": 1.0,
+      "actualModes": {
+        "none": 3,
+        "text": 27
+      },
+      "medianRetrievalMs": 0.0,
+      "p95RetrievalMs": 1
+    },
+    "vector": {
+      "cases": 30,
+      "meanRecallAt4": 1.0,
+      "coverageAccuracy": 1.0,
+      "actualModes": {
+        "none": 3,
+        "vector": 27
+      },
+      "medianRetrievalMs": 14.0,
+      "p95RetrievalMs": 21
+    },
+    "hybrid": {
+      "cases": 30,
+      "meanRecallAt4": 1.0,
+      "coverageAccuracy": 1.0,
+      "actualModes": {
+        "hybrid": 27,
+        "none": 3
+      },
+      "medianRetrievalMs": 23.0,
+      "p95RetrievalMs": 34
+    }
+  },
+  "rows": [
+    {
+      "id": "T01",
+      "query": "曲线在某处是平的地方，那里就肯定是最高点或者最低点吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "EXT-007",
+        "EXT-001",
+        "EXT-002",
+        "EXT-005"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T02",
+      "query": "在一个点连续，能直接说明左右导数相等吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-004",
+        "DER-006",
+        "MVT-003",
+        "MON-002"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T03",
+      "query": "求函数f(x)=(2x+5)^2的导数，需要乘里面的2吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-014",
+        "DER-019",
+        "DER-015",
+        "DER-016"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 1,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T04",
+      "query": "求u(x)v(x)的导数，可以把两个导数直接相乘吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-017",
+        "DER-011",
+        "DER-016",
+        "DER-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 2,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T05",
+      "query": "求f(x)/g(x)的导数，在g(x)=0的地方可以使用商法则吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-015",
+        "DER-017",
+        "DER-013",
+        "DER-010"
+      ],
+      "recallAt4": 0.0,
+      "coverageCorrect": true,
+      "retrievalMs": 1,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T06",
+      "query": "给定函数的导数在点左边为正、右边为负，这个点是什么极值？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-003",
+        "MON-004",
+        "MON-005",
+        "MON-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 1,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T07",
+      "query": "一个驻点左右两边导数都为正，怎么判断它有没有极值？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-007",
+        "MON-005",
+        "EXT-005",
+        "DER-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T08",
+      "query": "求导发现f'(a)=0且f''(a)>0，是否还需要检查二阶判别条件？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-006",
+        "MON-009",
+        "MON-007",
+        "EXT-009"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T09",
+      "query": "求导后发现一次和二次导数都在零点为零，是否还要分析导数变号？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-005",
+        "MON-009",
+        "DER-014",
+        "MON-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T10",
+      "query": "在闭区间上函数连续，最大值最小值是否都能取到？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "EXT-010",
+        "EXT-009",
+        "EXT-011",
+        "EXT-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T11",
+      "query": "只检查驻点就能得到闭区间上的最大函数值吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "EXT-009",
+        "EXT-010",
+        "EXT-011",
+        "EXT-001"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T12",
+      "query": "原函数在一个候选点没有定义，这个点能算它的极值点吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "EXT-006",
+        "EXT-002",
+        "MVT-003",
+        "EXT-005"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T13",
+      "query": "某个开区间里处处可导且导数恒为0，函数在这里会变化吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MVT-003",
+        "MVT-001",
+        "MON-001",
+        "MON-002"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T14",
+      "query": "中值定理中f(a)=f(b)但内部有一个点不可导，还能直接用罗尔定理吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MVT-001",
+        "MVT-002",
+        "MVT-003",
+        "EXT-010"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T15",
+      "query": "拉格朗日中值定理是否要求两个端点都可导？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MVT-002",
+        "MVT-001",
+        "MVT-003",
+        "EXT-011"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T16",
+      "query": "求导后发现区间导数处处小于0，函数在这个区间有什么单调性？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-001",
+        "MON-002",
+        "MON-005",
+        "MVT-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T17",
+      "query": "二阶导数一直为正，是否意味着函数值也一直递增？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-008",
+        "MON-009",
+        "MON-006",
+        "MON-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 1,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T18",
+      "query": "f(x)=x^4在原点二阶导数为0，为何还不是拐点？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-009",
+        "MON-007",
+        "EXT-007",
+        "MON-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T19",
+      "query": "绝对值函数在原点有最小值，为什么不能利用费马定理断言导数为零？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "EXT-008",
+        "DER-006",
+        "DER-005",
+        "EXT-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T20",
+      "query": "给定一个局部极小值点，它的函数值会比所有其他点都小吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "EXT-002",
+        "EXT-003",
+        "EXT-008",
+        "EXT-001"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T21",
+      "query": "位置对时间求导得到的是平均速度还是瞬时速度？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-003",
+        "EXT-011",
+        "DER-013",
+        "DER-015"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T22",
+      "query": "差商分母是h，能在求导取极限之前就把h设为0吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-001",
+        "DER-018",
+        "DER-012",
+        "DER-013"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T23",
+      "query": "已知切点(2,3)和导数值5，怎样列切线方程？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-002",
+        "EXT-007",
+        "DER-019",
+        "DER-014"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T24",
+      "query": "常数系数三次多项式求导时，常数项应该保留吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-014",
+        "DER-008",
+        "DER-007",
+        "DER-009"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T25",
+      "query": "求倒数1/g(x)的导数是不是1/g'(x)？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-013",
+        "DER-015",
+        "DER-018",
+        "DER-010"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T26",
+      "query": "怎样求两个可导函数和与差的导数？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-011",
+        "DER-010",
+        "DER-016",
+        "DER-009"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T27",
+      "query": "已知a是常数，求af(x)的导数如何处理系数？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-014",
+        "DER-009",
+        "DER-007",
+        "MVT-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T28",
+      "query": "两枚硬币同时投掷，恰好一枚正面的概率是多少？",
+      "requestedMode": "text",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T29",
+      "query": "求三阶矩阵的逆矩阵。",
+      "requestedMode": "text",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T30",
+      "query": "求从零到一的定积分，积分函数为x平方。",
+      "requestedMode": "text",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T01",
+      "query": "曲线在某处是平的地方，那里就肯定是最高点或者最低点吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-007",
+        "DER-006",
+        "EXT-009",
+        "EXT-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 13,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T02",
+      "query": "在一个点连续，能直接说明左右导数相等吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-004",
+        "MVT-001",
+        "DER-005",
+        "DER-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 13,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T03",
+      "query": "求函数f(x)=(2x+5)^2的导数，需要乘里面的2吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-011",
+        "DER-016",
+        "DER-017",
+        "DER-014"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 14,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T04",
+      "query": "求u(x)v(x)的导数，可以把两个导数直接相乘吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-011",
+        "DER-017",
+        "DER-016",
+        "DER-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 12,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T05",
+      "query": "求f(x)/g(x)的导数，在g(x)=0的地方可以使用商法则吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-012",
+        "DER-018",
+        "DER-011",
+        "DER-013"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 15,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T06",
+      "query": "给定函数的导数在点左边为正、右边为负，这个点是什么极值？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-004",
+        "MON-003",
+        "MON-005",
+        "DER-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 13,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T07",
+      "query": "一个驻点左右两边导数都为正，怎么判断它有没有极值？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-005",
+        "MON-004",
+        "EXT-005",
+        "MON-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 11,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T08",
+      "query": "求导发现f'(a)=0且f''(a)>0，是否还需要检查二阶判别条件？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-007",
+        "MON-009",
+        "MON-006",
+        "MON-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 14,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T09",
+      "query": "求导后发现一次和二次导数都在零点为零，是否还要分析导数变号？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-007",
+        "MON-005",
+        "MON-009",
+        "EXT-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 14,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T10",
+      "query": "在闭区间上函数连续，最大值最小值是否都能取到？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-010",
+        "EXT-011",
+        "EXT-009",
+        "EXT-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 12,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T11",
+      "query": "只检查驻点就能得到闭区间上的最大函数值吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-009",
+        "EXT-011",
+        "EXT-010",
+        "EXT-005"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 12,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T12",
+      "query": "原函数在一个候选点没有定义，这个点能算它的极值点吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-006",
+        "EXT-008",
+        "DER-006",
+        "EXT-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 12,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T13",
+      "query": "某个开区间里处处可导且导数恒为0，函数在这里会变化吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-003",
+        "MON-001",
+        "MON-002",
+        "MON-005"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 17,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T14",
+      "query": "中值定理中f(a)=f(b)但内部有一个点不可导，还能直接用罗尔定理吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-001",
+        "DER-004",
+        "DER-006",
+        "EXT-008"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 14,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T15",
+      "query": "拉格朗日中值定理是否要求两个端点都可导？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-002",
+        "MVT-001",
+        "EXT-008",
+        "MON-005"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 12,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T16",
+      "query": "求导后发现区间导数处处小于0，函数在这个区间有什么单调性？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-001",
+        "MON-002",
+        "MON-005",
+        "DER-001"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 14,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T17",
+      "query": "二阶导数一直为正，是否意味着函数值也一直递增？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-008",
+        "MON-001",
+        "MON-004",
+        "MON-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 15,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T18",
+      "query": "f(x)=x^4在原点二阶导数为0，为何还不是拐点？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-009",
+        "EXT-007",
+        "MON-007",
+        "DER-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 14,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T19",
+      "query": "绝对值函数在原点有最小值，为什么不能利用费马定理断言导数为零？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-008",
+        "DER-006",
+        "EXT-004",
+        "EXT-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 18,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T20",
+      "query": "给定一个局部极小值点，它的函数值会比所有其他点都小吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-002",
+        "EXT-003",
+        "EXT-008",
+        "MON-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 17,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T21",
+      "query": "位置对时间求导得到的是平均速度还是瞬时速度？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-003",
+        "MVT-002",
+        "DER-002",
+        "DER-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 13,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T22",
+      "query": "差商分母是h，能在求导取极限之前就把h设为0吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-018",
+        "DER-001",
+        "DER-012",
+        "DER-013"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 14,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T23",
+      "query": "已知切点(2,3)和导数值5，怎样列切线方程？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-002",
+        "DER-006",
+        "EXT-007",
+        "DER-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 23,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T24",
+      "query": "常数系数三次多项式求导时，常数项应该保留吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-014",
+        "DER-009",
+        "DER-007",
+        "DER-013"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 13,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T25",
+      "query": "求倒数1/g(x)的导数是不是1/g'(x)？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-013",
+        "DER-016",
+        "DER-006",
+        "DER-017"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 14,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T26",
+      "query": "怎样求两个可导函数和与差的导数？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-010",
+        "DER-011",
+        "DER-004",
+        "DER-014"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 21,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T27",
+      "query": "已知a是常数，求af(x)的导数如何处理系数？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-009",
+        "DER-014",
+        "DER-007",
+        "DER-008"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 19,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T28",
+      "query": "两枚硬币同时投掷，恰好一枚正面的概率是多少？",
+      "requestedMode": "vector",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T29",
+      "query": "求三阶矩阵的逆矩阵。",
+      "requestedMode": "vector",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T30",
+      "query": "求从零到一的定积分，积分函数为x平方。",
+      "requestedMode": "vector",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T01",
+      "query": "曲线在某处是平的地方，那里就肯定是最高点或者最低点吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-007",
+        "EXT-001",
+        "DER-006",
+        "EXT-002"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 23,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T02",
+      "query": "在一个点连续，能直接说明左右导数相等吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-004",
+        "DER-006",
+        "DER-005",
+        "MVT-001"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 14,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T03",
+      "query": "求函数f(x)=(2x+5)^2的导数，需要乘里面的2吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-014",
+        "DER-016",
+        "DER-011",
+        "DER-019"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 21,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T04",
+      "query": "求u(x)v(x)的导数，可以把两个导数直接相乘吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-011",
+        "DER-017",
+        "DER-016",
+        "DER-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 28,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T05",
+      "query": "求f(x)/g(x)的导数，在g(x)=0的地方可以使用商法则吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-015",
+        "DER-012",
+        "DER-018",
+        "DER-013"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 36,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T06",
+      "query": "给定函数的导数在点左边为正、右边为负，这个点是什么极值？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-003",
+        "MON-004",
+        "MON-005",
+        "DER-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 34,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T07",
+      "query": "一个驻点左右两边导数都为正，怎么判断它有没有极值？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-005",
+        "EXT-005",
+        "DER-006",
+        "MON-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 28,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T08",
+      "query": "求导发现f'(a)=0且f''(a)>0，是否还需要检查二阶判别条件？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-006",
+        "MON-007",
+        "MON-009",
+        "DER-018"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 16,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T09",
+      "query": "求导后发现一次和二次导数都在零点为零，是否还要分析导数变号？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-005",
+        "MON-007",
+        "MON-009",
+        "MON-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 32,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T10",
+      "query": "在闭区间上函数连续，最大值最小值是否都能取到？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-010",
+        "EXT-009",
+        "EXT-011",
+        "EXT-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 24,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T11",
+      "query": "只检查驻点就能得到闭区间上的最大函数值吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-009",
+        "EXT-010",
+        "EXT-011",
+        "EXT-001"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 23,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T12",
+      "query": "原函数在一个候选点没有定义，这个点能算它的极值点吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-006",
+        "MON-005",
+        "MON-003",
+        "EXT-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 21,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T13",
+      "query": "某个开区间里处处可导且导数恒为0，函数在这里会变化吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-003",
+        "MON-001",
+        "MON-002",
+        "DER-001"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 19,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T14",
+      "query": "中值定理中f(a)=f(b)但内部有一个点不可导，还能直接用罗尔定理吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-001",
+        "MVT-002",
+        "DER-006",
+        "EXT-008"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 30,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T15",
+      "query": "拉格朗日中值定理是否要求两个端点都可导？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-002",
+        "MVT-001",
+        "EXT-009",
+        "EXT-008"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 30,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T16",
+      "query": "求导后发现区间导数处处小于0，函数在这个区间有什么单调性？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-001",
+        "MON-002",
+        "MON-005",
+        "DER-016"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 13,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T17",
+      "query": "二阶导数一直为正，是否意味着函数值也一直递增？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-008",
+        "MON-001",
+        "MON-009",
+        "MON-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 17,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T18",
+      "query": "f(x)=x^4在原点二阶导数为0，为何还不是拐点？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-009",
+        "EXT-007",
+        "MON-007",
+        "DER-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 20,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T19",
+      "query": "绝对值函数在原点有最小值，为什么不能利用费马定理断言导数为零？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-008",
+        "DER-006",
+        "EXT-004",
+        "EXT-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 25,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T20",
+      "query": "给定一个局部极小值点，它的函数值会比所有其他点都小吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-002",
+        "EXT-003",
+        "EXT-008",
+        "EXT-001"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 25,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T21",
+      "query": "位置对时间求导得到的是平均速度还是瞬时速度？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-003",
+        "MVT-002",
+        "DER-001",
+        "EXT-011"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 25,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T22",
+      "query": "差商分母是h，能在求导取极限之前就把h设为0吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-001",
+        "DER-018",
+        "DER-012",
+        "DER-013"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 30,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T23",
+      "query": "已知切点(2,3)和导数值5，怎样列切线方程？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-002",
+        "EXT-007",
+        "DER-006",
+        "DER-019"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 20,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T24",
+      "query": "常数系数三次多项式求导时，常数项应该保留吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-014",
+        "DER-009",
+        "DER-007",
+        "DER-008"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 23,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T25",
+      "query": "求倒数1/g(x)的导数是不是1/g'(x)？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-013",
+        "DER-017",
+        "DER-006",
+        "DER-019"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 28,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T26",
+      "query": "怎样求两个可导函数和与差的导数？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-010",
+        "DER-011",
+        "DER-016",
+        "DER-017"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 20,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T27",
+      "query": "已知a是常数，求af(x)的导数如何处理系数？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-009",
+        "DER-014",
+        "DER-007",
+        "MVT-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 21,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T28",
+      "query": "两枚硬币同时投掷，恰好一枚正面的概率是多少？",
+      "requestedMode": "hybrid",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T29",
+      "query": "求三阶矩阵的逆矩阵。",
+      "requestedMode": "hybrid",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "T30",
+      "query": "求从零到一的定积分，积分函数为x平方。",
+      "requestedMode": "hybrid",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    }
+  ]
+}

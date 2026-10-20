@@ -30,11 +30,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
 
 # typescript
+*.tsbuildinfo
 next-env.d.ts
 /dist/
 /.wrangler/
@@ -44,3 +46,10 @@ next-env.d.ts
 /.codex/
 /outputs/
 /work/
+/.local-server/
+# Generated from the pinned pdfjs-dist package before dev/build.
+/public/vendor/pdf.worker.min.mjs
+/.rag-runtime/
+/.taste-skill/
+/site-deploy*.tgz
+__pycache__/

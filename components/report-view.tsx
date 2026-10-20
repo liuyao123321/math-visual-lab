@@ -1,27 +1,31 @@
 "use client";
 
-import Link from "next/link";
-import { BarChart3, BookOpenCheck, CheckCircle2, Lightbulb, Target } from "lucide-react";
+import { BarChart3, BookOpenCheck, BrainCircuit, CheckCircle2, Target } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
 import { reportSummary } from "@/lib/math";
+import { buildStudyRecommendations, learningGoalLabels } from "@/lib/personalization";
 import { useMathLabStore } from "@/lib/store";
 
-const topicConfig = { count: { label: "待复习错题", color: "#22d3ee" } } satisfies ChartConfig;
+const topicConfig = { count: { label: "待复习错题", color: "var(--chart-1)" } } satisfies ChartConfig;
 const masteryConfig = {
   value: { label: "题目数" },
-  mastered: { label: "已掌握", color: "#10b981" },
-  pending: { label: "复习中", color: "#f59e0b" },
+  mastered: { label: "已掌握", color: "var(--chart-4)" },
+  pending: { label: "复习中", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
 export function ReportView() {
   const mistakes = useMathLabStore((state) => state.mistakes);
+  const settings = useMathLabStore((state) => state.settings);
+  const understandingAttempts = useMathLabStore((state) => state.understandingAttempts);
   const summary = reportSummary(mistakes);
+  const recommendations = buildStudyRecommendations(mistakes, settings.learnerProfile);
+  const firstReviewId = recommendations[0]?.mistakeId ?? mistakes[0]?.id;
   const masteryData = [
-    { name: "已掌握", value: summary.mastered, fill: "#10b981" },
-    { name: "待巩固", value: summary.total - summary.mastered, fill: "#f59e0b" },
+    { name: "已掌握", value: summary.mastered, fill: "var(--chart-4)" },
+    { name: "待巩固", value: summary.total - summary.mastered, fill: "var(--chart-2)" },
   ];
   const recentDays = Array.from({ length: 7 }, (_, offset) => {
     const date = new Date();
@@ -32,20 +36,21 @@ export function ReportView() {
 
   if (!mistakes.length) return (
     <main className="mx-auto max-w-6xl px-4 py-10 lg:px-8">
-      <div><p className="text-sm font-medium text-cyan-600 dark:text-cyan-300">学习报告</p><h1 className="mt-1 text-3xl font-semibold tracking-tight">让每次出错都有下一步</h1></div>
-      <section className="mt-8 grid min-h-[430px] place-items-center rounded-2xl border border-dashed border-border bg-card/50 text-center"><div className="max-w-md p-8"><BarChart3 className="mx-auto size-12 text-muted-foreground/45" /><h2 className="mt-5 text-xl font-semibold">完成第一条错题记录后，这里会生成报告</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">报告会分析掌握率、薄弱知识点和最近七天的复习节奏。</p><Button asChild className="mt-6"><Link href="/solve?example=example-quadratic">从示例题开始</Link></Button></div></section>
+      <div><p className="text-sm font-medium text-primary dark:text-primary">学习报告</p><h1 className="mt-1 text-3xl font-semibold tracking-tight">让每次出错都有下一步</h1></div>
+      <section className="mt-8 grid min-h-[430px] place-items-center rounded-2xl border border-dashed border-border bg-card/50 text-center"><div className="max-w-md p-8"><BarChart3 className="mx-auto size-12 text-muted-foreground/45" /><h2 className="mt-5 text-xl font-semibold">完成第一条错题记录后，这里会生成报告</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">报告会分析掌握率、薄弱知识点和最近七天的复习节奏。</p><Button asChild className="mt-6"><a href="/solve?example=example-quadratic">从示例题开始</a></Button></div></section>
     </main>
   );
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
-      <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end"><div><p className="text-sm font-medium text-cyan-600 dark:text-cyan-300">学习报告</p><h1 className="mt-1 text-3xl font-semibold tracking-tight">让数据告诉你下一步复习什么</h1><p className="mt-2 text-sm text-muted-foreground">统计仅来自当前浏览器中的错题记录。</p></div><Button asChild variant="outline"><Link href="/mistakes">管理错题</Link></Button></div>
+      <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end"><div><p className="text-sm font-medium text-primary dark:text-primary">学习报告</p><h1 className="mt-1 text-3xl font-semibold tracking-tight">让数据告诉你下一步复习什么</h1><p className="mt-2 text-sm text-muted-foreground">统计仅来自当前浏览器中的错题记录。</p></div><Button asChild variant="outline"><a href="/mistakes">管理错题</a></Button></div>
 
+      <div className="laboratory-panel mt-6 flex flex-col justify-between gap-3 p-4 sm:flex-row sm:items-center"><p className="text-sm">根据薄弱知识点和错题生成专项模拟试卷。</p><Button asChild variant="outline"><a href="/practice">进入专项模拟</a></Button></div>
       <section className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="laboratory-panel p-5"><BookOpenCheck className="size-5 text-cyan-500" /><p className="mt-5 text-3xl font-semibold">{summary.total}</p><p className="mt-1 text-sm text-muted-foreground">错题总数</p></article>
+        <article className="laboratory-panel p-5"><BookOpenCheck className="size-5 text-primary" /><p className="mt-5 text-3xl font-semibold">{summary.total}</p><p className="mt-1 text-sm text-muted-foreground">错题总数</p></article>
         <article className="laboratory-panel p-5"><CheckCircle2 className="size-5 text-emerald-500" /><p className="mt-5 text-3xl font-semibold">{summary.mastered}</p><p className="mt-1 text-sm text-muted-foreground">已经掌握</p></article>
         <article className="laboratory-panel p-5"><Target className="size-5 text-amber-500" /><p className="mt-5 text-3xl font-semibold">{summary.masteredRate}%</p><p className="mt-1 text-sm text-muted-foreground">总体掌握率</p></article>
-        <article className="laboratory-panel p-5"><BarChart3 className="size-5 text-violet-500" /><p className="mt-5 text-3xl font-semibold">{mistakes.reduce((sum, item) => sum + item.attempts, 0)}</p><p className="mt-1 text-sm text-muted-foreground">累计复习次数</p></article>
+        <article className="laboratory-panel p-5"><BarChart3 className="size-5 text-primary" /><p className="mt-5 text-3xl font-semibold">{mistakes.reduce((sum, item) => sum + item.attempts, 0)}</p><p className="mt-1 text-sm text-muted-foreground">累计复习次数</p></article>
       </section>
 
       <section className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
@@ -54,8 +59,16 @@ export function ReportView() {
       </section>
 
       <section className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-        <article className="laboratory-panel p-5"><div className="mb-5"><h2 className="font-semibold">近 7 天学习节奏</h2><p className="mt-1 text-sm text-muted-foreground">新增或再次练习都会计入当天</p></div><ChartContainer config={topicConfig} className="h-[230px] w-full"><BarChart accessibilityLayer data={recentDays}><CartesianGrid vertical={false} /><XAxis dataKey="day" tickLine={false} axisLine={false} /><YAxis allowDecimals={false} tickLine={false} axisLine={false} width={24} /><ChartTooltip content={<ChartTooltipContent />} /><Bar dataKey="count" fill="#22d3ee" radius={[6, 6, 0, 0]} /></BarChart></ChartContainer></article>
-        <article className="laboratory-panel p-6"><div className="flex items-center gap-2"><Lightbulb className="size-5 text-amber-500" /><h2 className="font-semibold">本次复习建议</h2></div><div className="mt-5 space-y-4">{summary.weakTopics.slice(0, 3).map((item, index) => <div key={item.topic} className="flex gap-3"><span className="grid size-7 shrink-0 place-items-center rounded-full bg-amber-500/10 text-sm font-semibold text-amber-700 dark:text-amber-300">{index + 1}</span><div><p className="font-medium">{item.topic}</p><p className="mt-1 text-sm leading-6 text-muted-foreground">优先重做相关错题，并用自己的话解释关键步骤。</p></div></div>)}</div><Button asChild className="mt-6 w-full"><Link href="/mistakes">开始复习薄弱项</Link></Button></article>
+        <article className="laboratory-panel p-5"><div className="mb-5"><h2 className="font-semibold">近 7 天学习节奏</h2><p className="mt-1 text-sm text-muted-foreground">新增或再次练习都会计入当天</p></div><ChartContainer config={topicConfig} className="h-[230px] w-full"><BarChart accessibilityLayer data={recentDays}><CartesianGrid vertical={false} /><XAxis dataKey="day" tickLine={false} axisLine={false} /><YAxis allowDecimals={false} tickLine={false} axisLine={false} width={24} /><ChartTooltip content={<ChartTooltipContent />} /><Bar dataKey="count" fill="var(--chart-1)" radius={[6, 6, 0, 0]} /></BarChart></ChartContainer></article>
+        <article className="laboratory-panel p-6">
+          <div className="flex items-center gap-2"><BrainCircuit className="size-5 text-primary" /><h2 className="font-semibold">{settings.learnerProfile.personalizationEnabled ? "AI 个性化复习建议" : "本地复习建议"}</h2></div>
+          <p className="mt-2 text-xs leading-5 text-muted-foreground">当前目标：{learningGoalLabels[settings.learnerProfile.learningGoal]}。建议只在当前浏览器中根据错题统计生成，不会自动修改掌握状态{settings.learnerProfile.personalizationEnabled ? "。" : "，也不会发送学习画像。"}</p>
+          <div className="mt-5 space-y-4">
+            {recommendations.length ? recommendations.map((item) => <div key={item.topic} className="flex gap-3"><span className="grid size-7 shrink-0 place-items-center rounded-full bg-amber-500/10 text-sm font-semibold text-amber-700 dark:text-amber-300">{item.order}</span><div><p className="font-medium">{item.topic}</p><p className="mt-1 text-sm leading-6 text-muted-foreground">{item.reason}</p><p className="mt-1 text-sm leading-6">{item.action}</p>{item.mistakeId && <a className="mt-1 inline-block text-sm font-medium text-primary underline-offset-4 hover:underline dark:text-primary" href={`/solve?mistake=${item.mistakeId}`}>重做这类错题</a>}</div></div>) : <div className="rounded-xl bg-emerald-500/[0.07] p-4"><div className="flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-300"><CheckCircle2 className="size-4" />当前错题都已标记掌握</div><p className="mt-2 text-sm leading-6 text-muted-foreground">建议隔几天随机重做一道，确认方法仍能独立完成。</p></div>}
+          </div>
+          <div className="mt-5 flex items-center justify-between rounded-lg bg-muted/45 px-3 py-2 text-xs text-muted-foreground"><span>已完成理解检查</span><span>{understandingAttempts.length} 次</span></div>
+          <Button asChild className="mt-4 w-full"><a href={firstReviewId ? `/solve?mistake=${firstReviewId}` : "/mistakes"}>开始 10 分钟复习</a></Button>
+        </article>
       </section>
     </main>
   );

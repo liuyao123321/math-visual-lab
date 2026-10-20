@@ -1,0 +1,5 @@
+sentence-transformers
+fastapi
+uvicorn
+# Install CPU torch first: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+# This project's tested exact versions are recorded in requirements.lock.txt.

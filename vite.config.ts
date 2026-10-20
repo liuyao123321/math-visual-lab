@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 import hostingConfig from "./.openai/hosting.json";
 import { readExecutionProfile } from "./scripts/execution-profile.mjs";
 import { sites } from "./build/sites-vite-plugin";
+import { developmentWatchOptions } from "./scripts/dev-watch.mjs";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
@@ -35,7 +36,12 @@ const localBindingConfig = {
     : [],
 };
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ command }) => {
+  // This app has no Worker-only bindings. Use Vinext's in-process Node dev
+  // runtime on Windows: an exited workerd otherwise leaves Vite listening
+  // while every rendered page returns 500. Production stays on Workers.
+  const windowsNodeDev = command === "serve" && process.platform === "win32"
+    && !managedLinux && !d1 && !r2;
   // Use Miniflare's local Request.cf placeholder unless fetching is requested.
   process.env.CLOUDFLARE_CF_FETCH_ENABLED ??= "false";
   process.env.WRANGLER_SEND_METRICS ??= "false";
@@ -48,21 +54,25 @@ export default defineConfig(async () => {
   process.env.MINIFLARE_REGISTRY_PATH ??= ".wrangler/registry";
 
   // Wrangler snapshots its log path while the Cloudflare plugin is imported.
-  const { cloudflare } = await import("@cloudflare/vite-plugin");
+  const workerPlugins = windowsNodeDev ? [] : [
+    (await import("@cloudflare/vite-plugin")).cloudflare({
+      viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
+      inspectorPort: false,
+      config: localBindingConfig,
+    }),
+  ];
 
   return {
     server: {
+      // The desktop launcher opens a fixed URL; never silently switch ports.
+      ...(process.env.MATHLAB_LAUNCHER === "1" ? { strictPort: true } : {}),
       ...(managedLinux ? { host: "0.0.0.0", allowedHosts: ["terminal.local"] } : {}),
-      ...(isCodexSeatbeltSandbox ? { watch: { useFsEvents: false, usePolling: true } } : {}),
+      watch: developmentWatchOptions({ polling: isCodexSeatbeltSandbox }),
     },
     plugins: [
       vinext(),
       sites({ mockAuth: !managedLinux }),
-      cloudflare({
-        viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
-        inspectorPort: false,
-        config: localBindingConfig,
-      }),
+      ...workerPlugins,
     ],
   };
 });

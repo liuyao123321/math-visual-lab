@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compileSafeExpression, reportSummary, sampleExpression } from "@/lib/math";
+import { compileSafeExpression, evaluateExpression, reportSummary, sampleExpression } from "@/lib/math";
 
 describe("safe math evaluation", () => {
   it("samples an allowed expression", () => {
@@ -12,6 +12,12 @@ describe("safe math evaluation", () => {
     expect(() => compileSafeExpression("import('x')")).toThrow();
     expect(() => compileSafeExpression("x; alert(1)")).toThrow();
     expect(() => compileSafeExpression("random() + x")).toThrow();
+  });
+
+  it("evaluates parameter-only coordinate expressions safely", () => {
+    expect(evaluateExpression("2-sqrt(4-k)", { k: 3 })).toBe(1);
+    expect(evaluateExpression("2-sqrt(4-k)", { k: 5 })).toBeNull();
+    expect(evaluateExpression("unknown+1", { k: 3 })).toBeNull();
   });
 });
 

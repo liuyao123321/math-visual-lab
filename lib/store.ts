@@ -1,13 +1,16 @@
 "use client";
 
 import { create } from "zustand";
-import type { Mastery, MistakeRecord, SolveResult, UserSettings } from "@/lib/math-schema";
-import { defaultSettings, readMistakes, readSettings, writeMistakes, writeSettings } from "@/lib/storage";
+import type { LearnerProfile, Mastery, MistakeRecord, SolveResult, UnderstandingAttempt, UserSettings } from "@/lib/math-schema";
+import { defaultLearnerProfile, defaultSettings, readMistakes, readSettings, readUnderstandingAttempts, writeMistakes, writeSettings, writeUnderstandingAttempts } from "@/lib/storage";
+import { useLearningStore } from "@/lib/learning-store";
+import type { HandwritingSession } from "@/lib/handwriting-session";
 
 type AddMistakeInput = {
   solution: SolveResult;
   errorReason: string;
   note: string;
+  handwriting?: HandwritingSession;
 };
 
 type MathLabState = {
@@ -15,6 +18,7 @@ type MathLabState = {
   mistakes: MistakeRecord[];
   settings: UserSettings;
   currentSolution: SolveResult | null;
+  understandingAttempts: UnderstandingAttempt[];
   hydrate: () => void;
   setCurrentSolution: (solution: SolveResult | null) => void;
   addMistake: (input: AddMistakeInput) => MistakeRecord;
@@ -22,6 +26,9 @@ type MathLabState = {
   practiceMistake: (id: string) => void;
   removeMistake: (id: string) => void;
   updateSettings: (patch: Partial<Omit<UserSettings, "version">>) => void;
+  updateLearnerProfile: (patch: Partial<Omit<LearnerProfile, "version">>) => void;
+  resetLearnerProfile: () => void;
+  recordUnderstandingAttempt: (attempt: Omit<UnderstandingAttempt, "id" | "createdAt">) => void;
 };
 
 export const useMathLabStore = create<MathLabState>((set, get) => ({
@@ -29,12 +36,13 @@ export const useMathLabStore = create<MathLabState>((set, get) => ({
   mistakes: [],
   settings: defaultSettings,
   currentSolution: null,
+  understandingAttempts: [],
   hydrate: () => {
     if (get().hydrated || typeof window === "undefined") return;
-    set({ mistakes: readMistakes(), settings: readSettings(), hydrated: true });
+    set({ mistakes: readMistakes(), settings: readSettings(), understandingAttempts: readUnderstandingAttempts(), hydrated: true });
   },
   setCurrentSolution: (currentSolution) => set({ currentSolution }),
-  addMistake: ({ solution, errorReason, note }) => {
+  addMistake: ({ solution, errorReason, note, handwriting }) => {
     const now = new Date().toISOString();
     const record: MistakeRecord = {
       id: crypto.randomUUID(),
@@ -51,6 +59,7 @@ export const useMathLabStore = create<MathLabState>((set, get) => ({
       createdAt: now,
       updatedAt: now,
       lastPracticedAt: null,
+      ...(handwriting ? { handwriting } : {}),
     };
     const next = [record, ...get().mistakes];
     writeMistakes(next);
@@ -66,6 +75,7 @@ export const useMathLabStore = create<MathLabState>((set, get) => ({
     const next = get().mistakes.map((item) => item.id === id ? { ...item, attempts: item.attempts + 1, lastPracticedAt: new Date().toISOString(), updatedAt: new Date().toISOString() } : item);
     writeMistakes(next);
     set({ mistakes: next });
+    if (next.some((item) => item.id === id)) useLearningStore.getState().activity();
   },
   removeMistake: (id) => {
     const next = get().mistakes.filter((item) => item.id !== id);
@@ -73,9 +83,29 @@ export const useMathLabStore = create<MathLabState>((set, get) => ({
     set({ mistakes: next });
   },
   updateSettings: (patch) => {
-    const next = { ...get().settings, ...patch, version: 1 as const };
+    const next = { ...get().settings, ...patch, version: 2 as const };
     writeSettings(next);
     set({ settings: next });
+  },
+  updateLearnerProfile: (patch) => {
+    const next = {
+      ...get().settings,
+      learnerProfile: { ...get().settings.learnerProfile, ...patch, version: 1 as const },
+      version: 2 as const,
+    };
+    writeSettings(next);
+    set({ settings: next });
+  },
+  resetLearnerProfile: () => {
+    const next = { ...get().settings, learnerProfile: defaultLearnerProfile, version: 2 as const };
+    writeSettings(next);
+    set({ settings: next });
+  },
+  recordUnderstandingAttempt: (attempt) => {
+    const next = [{ ...attempt, id: crypto.randomUUID(), createdAt: new Date().toISOString() }, ...get().understandingAttempts].slice(0, 100);
+    writeUnderstandingAttempts(next);
+    set({ understandingAttempts: next });
+    useLearningStore.getState().activity();
   },
 }));
 

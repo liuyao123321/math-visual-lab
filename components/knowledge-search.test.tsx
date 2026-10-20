@@ -1,0 +1,104 @@
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { KnowledgeSearch } from "./knowledge-search";
+import { readTextbookSelection, writeTextbookSelection, availableTextbooks } from "@/lib/textbooks";
+import type { RagSnapshot } from "@/lib/rag/schema";
+import { readPersonalLibrary, savePersonalBook } from "@/lib/personal-library";
+import { personalBookFixture as personalBook } from "@/testdata/personal-library";
+const snapshot: RagSnapshot = { version: 1, knowledgeBaseVersion: "test-fixture", status: "no_match", retrievalMode: "none",
+  vectorStatus: "not_requested", message: "测试情境：未覆盖该知识", cards: [], usedKnowledgeIds: [], retrievalMs: 0 };
+beforeEach(() => localStorage.clear());
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+describe("independent textbook search", () => {
+  it("keeps personal matches available when all-materials public search fails", async () => {
+    savePersonalBook(personalBook);
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+    render(<KnowledgeSearch />);
+    fireEvent.change(screen.getByLabelText("检索课程知识的问题"), { target: { value: "矩阵乘法" } });
+    fireEvent.submit(screen.getByRole("form", { name: "教材知识检索" }));
+    await screen.findByText(/公共课程检索暂不可用/);
+    expect(screen.getByText(/用户核对的原文摘录/)).toBeInTheDocument();
+  });
+  it("searches a personal PDF without sending the query or private pages to any server, then restores selection", async () => {
+    savePersonalBook(personalBook); writeTextbookSelection(personalBook.id);
+    const fetcher = vi.fn(); vi.stubGlobal("fetch", fetcher);
+    render(<KnowledgeSearch />);
+    expect(screen.getByLabelText("检索教材")).toHaveValue(personalBook.id);
+    fireEvent.change(screen.getByLabelText("检索课程知识的问题"), { target: { value: "矩阵乘法" } });
+    fireEvent.submit(screen.getByRole("form", { name: "教材知识检索" }));
+    await screen.findByText("知识检索结果");
+    expect(screen.getByText(/未经教师复核/)).toBeInTheDocument();
+    expect(screen.getByText(/test-linear-algebra.pdf · PDF文件第3页/)).toBeInTheDocument();
+    expect(fetcher).not.toHaveBeenCalled();
+    cleanup(); render(<KnowledgeSearch />);
+    expect(screen.getByLabelText("检索教材")).toHaveValue(personalBook.id);
+  });
+  it("shows a dedicated page, empty question and honest partial-textbook coverage", () => {
+    render(<KnowledgeSearch />);
+    expect(screen.getByRole("heading", { name: "课程知识检索" })).toBeInTheDocument();
+    expect(screen.getByLabelText("检索课程知识的问题")).toHaveValue("");
+    expect(screen.getByRole("button", { name: "检索教材依据" })).toBeDisabled();
+    expect(screen.queryByText(/当前已收录 1 本教材的部分章节/)).not.toBeInTheDocument();
+    expect(screen.getByText("教材收录情况")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "上传 PDF 教材" })).toBeEnabled();
+  });
+  it("removes the personal consent row without changing stored books or their permissions", () => {
+    savePersonalBook(personalBook);
+    const before = readPersonalLibrary().books;
+    render(<KnowledgeSearch />);
+    expect(screen.queryByRole("checkbox", { name: /允许匹配摘录/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "移除这份个人教材" })).toBeInTheDocument();
+    expect(readPersonalLibrary().books).toEqual(before);
+    fireEvent.click(screen.getByRole("button", { name: "上传 PDF 教材" }));
+    expect(screen.getByLabelText("选择PDF教材文件")).toBeInTheDocument();
+    expect(readPersonalLibrary().books).toEqual(before);
+  });
+  it("restores the user's selected textbook and searches without any model credential", async () => {
+    writeTextbookSelection(availableTextbooks[0].id);
+    const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ data: snapshot })));
+    vi.stubGlobal("fetch", fetcher);
+    render(<KnowledgeSearch />);
+    expect(screen.getByLabelText("检索教材")).toHaveValue(availableTextbooks[0].id);
+    fireEvent.change(screen.getByLabelText("检索课程知识的问题"), { target: { value: "导数定义" } });
+    fireEvent.submit(screen.getByRole("form", { name: "教材知识检索" }));
+    await screen.findByText("测试情境：未覆盖该知识");
+    const sent = fetcher.mock.calls[0][1];
+    expect(JSON.parse(sent.body)).toEqual({ query: "导数定义", textbookIds: [availableTextbooks[0].id] });
+    expect(sent.headers.Authorization).toBeUndefined();
+  });
+  it("persists a changed selection and clears stale results when switching textbooks", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ data: snapshot }))));
+    render(<KnowledgeSearch />);
+    fireEvent.change(screen.getByLabelText("检索教材"), { target: { value: availableTextbooks[0].id } });
+    expect(readTextbookSelection()).toBe(availableTextbooks[0].id);
+    fireEvent.change(screen.getByLabelText("检索课程知识的问题"), { target: { value: "极值条件" } });
+    fireEvent.submit(screen.getByRole("form", { name: "教材知识检索" }));
+    await screen.findByText("测试情境：未覆盖该知识");
+    fireEvent.change(screen.getByLabelText("检索教材"), { target: { value: "all" } });
+    expect(screen.queryByText("测试情境：未覆盖该知识")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("检索课程知识的问题")).toHaveValue("极值条件");
+    cleanup(); render(<KnowledgeSearch />);
+    expect(screen.getByLabelText("检索教材")).toHaveValue("all");
+  });
+  it("ignores late responses after the selection changes", async () => {
+    let resolve!: (response: Response) => void;
+    vi.stubGlobal("fetch", vi.fn().mockImplementation(() => new Promise<Response>((done) => { resolve = done; })));
+    render(<KnowledgeSearch />);
+    fireEvent.change(screen.getByLabelText("检索课程知识的问题"), { target: { value: "导数定义" } });
+    fireEvent.submit(screen.getByRole("form", { name: "教材知识检索" }));
+    fireEvent.change(screen.getByLabelText("检索教材"), { target: { value: availableTextbooks[0].id } });
+    resolve(new Response(JSON.stringify({ data: snapshot })));
+    await waitFor(() => expect(screen.getByRole("button", { name: "检索教材依据" })).toBeEnabled());
+    expect(screen.queryByText("测试情境：未覆盖该知识")).not.toBeInTheDocument();
+  });
+  it("preserves the question and selected textbook after request failure", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+    render(<KnowledgeSearch />);
+    fireEvent.change(screen.getByLabelText("检索教材"), { target: { value: availableTextbooks[0].id } });
+    fireEvent.change(screen.getByLabelText("检索课程知识的问题"), { target: { value: "导数定义" } });
+    fireEvent.submit(screen.getByRole("form", { name: "教材知识检索" }));
+    await screen.findByRole("alert");
+    expect(screen.getByLabelText("检索课程知识的问题")).toHaveValue("导数定义");
+    expect(screen.getByLabelText("检索教材")).toHaveValue(availableTextbooks[0].id);
+  });
+});

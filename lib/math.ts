@@ -31,6 +31,14 @@ export function sampleExpression(expression: string, domain: [number, number], p
   return { x, y };
 }
 
+export function evaluateExpression(expression: string, parameters: Record<string, number>) {
+  try {
+    return compileSafeExpression(expression, Object.keys(parameters))(parameters);
+  } catch {
+    return null;
+  }
+}
+
 export function defaultParameterValues(spec?: VisualizationSpec) {
   return Object.fromEntries((spec?.parameters ?? []).map((item) => [item.key, item.defaultValue]));
 }

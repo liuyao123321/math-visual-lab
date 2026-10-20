@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { BookOpenCheck, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -10,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { MathFormula, MathText } from "@/components/math-formula";
+import { verdictLabels } from "@/lib/handwriting-schema";
 import type { Mastery } from "@/lib/math-schema";
 import { masteryLabels, useMathLabStore } from "@/lib/store";
 
@@ -30,7 +31,7 @@ export function MistakesView() {
     <main className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div><p className="text-sm font-medium text-amber-600 dark:text-amber-300">错题复习</p><h1 className="mt-1 text-3xl font-semibold tracking-tight">不是存起来，而是学会它</h1><p className="mt-2 text-sm text-muted-foreground">记录错误原因，重复练习，并逐步标记掌握状态。</p></div>
-        <Button asChild><Link href="/solve">继续做题</Link></Button>
+        <Button asChild><a href="/solve">继续做题</a></Button>
       </div>
 
       <section className="laboratory-panel mt-7 p-4">
@@ -41,14 +42,15 @@ export function MistakesView() {
         </div>
       </section>
 
-      {filtered.length === 0 ? <section className="mt-8 grid min-h-80 place-items-center rounded-2xl border border-dashed border-border text-center"><div><BookOpenCheck className="mx-auto size-10 text-muted-foreground/50" /><h2 className="mt-4 font-semibold">{mistakes.length ? "没有符合筛选条件的错题" : "错题集还是空的"}</h2><p className="mt-2 text-sm text-muted-foreground">{mistakes.length ? "尝试调整搜索词或筛选条件。" : "在答疑工作台完成解析后，记录错误原因并收藏。"}</p>{!mistakes.length && <Button asChild className="mt-5"><Link href="/solve?example=example-quadratic">查看示例题</Link></Button>}</div></section> :
+      {filtered.length === 0 ? <section className="mt-8 grid min-h-80 place-items-center rounded-2xl border border-dashed border-border text-center"><div><BookOpenCheck className="mx-auto size-10 text-muted-foreground/50" /><h2 className="mt-4 font-semibold">{mistakes.length ? "没有符合筛选条件的错题" : "错题集还是空的"}</h2><p className="mt-2 text-sm text-muted-foreground">{mistakes.length ? "尝试调整搜索词或筛选条件。" : "在答疑工作台完成解析后，记录错误原因并收藏。"}</p>{!mistakes.length && <Button asChild className="mt-5"><a href="/solve?example=example-quadratic">查看示例题</a></Button>}</div></section> :
       <section className="mt-6 grid gap-4 md:grid-cols-2">{filtered.map((item) => <article key={item.id} className="laboratory-panel flex flex-col p-5">
         <div className="flex items-start justify-between gap-3"><div className="flex flex-wrap gap-2"><Badge variant="secondary">{item.subject}</Badge><Badge variant="outline">{item.questionType}</Badge><Badge variant="outline">{item.difficulty}</Badge></div><AlertDialog><AlertDialogTrigger asChild><Button variant="ghost" size="icon-sm" aria-label="删除错题"><Trash2 /></Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>删除这道错题？</AlertDialogTitle><AlertDialogDescription>删除后无法恢复，相关学习报告统计也会更新。</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>取消</AlertDialogCancel><AlertDialogAction variant="destructive" onClick={() => { removeMistake(item.id); toast.success("错题已删除"); }}>删除</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog></div>
-        <h2 className="mt-4 line-clamp-2 font-semibold leading-7">{item.question}</h2>
-        <div className="mt-3 flex flex-wrap gap-1.5">{item.topics.map((topic) => <span key={topic} className="rounded-md bg-cyan-500/8 px-2 py-1 text-xs text-cyan-700 dark:text-cyan-300">{topic}</span>)}</div>
+        <h2 className="mt-4 font-semibold leading-7"><MathText value={item.question} /></h2>
+        {item.handwriting && <details className="mt-3 rounded-xl border p-3 text-sm"><summary className="cursor-pointer font-medium">查看已确认的手写步骤与 AI 评价</summary><p className="mt-2 text-muted-foreground">这是过程复盘，不是标准答案；错误原因由学生确认。</p>{item.handwriting.steps.map((step, index) => <div key={step.id} className="mt-3 space-y-2 border-t pt-2"><p className="font-medium">第{index + 1}步 · {item.handwriting?.evaluation ? verdictLabels[item.handwriting.evaluation.steps[index].status] : "待检查"}</p><MathText value={step.text} />{step.formulas.map((formula, i) => <MathFormula key={i} value={formula} />)}{item.handwriting?.evaluation && <MathText value={item.handwriting.evaluation.steps[index].basis} />}</div>)}</details>}
+        <div className="mt-3 flex flex-wrap gap-1.5">{item.topics.map((topic) => <span key={topic} className="rounded-md bg-primary/8 px-2 py-1 text-xs text-primary dark:text-primary">{topic}</span>)}</div>
         <div className="mt-5 grid gap-3 sm:grid-cols-2"><div><p className="mb-1.5 text-xs text-muted-foreground">错误原因</p><Input value={item.errorReason} onChange={(event) => updateMistake(item.id, { errorReason: event.target.value })} /></div><div><p className="mb-1.5 text-xs text-muted-foreground">掌握状态</p><Select value={item.mastery} onValueChange={(value) => updateMistake(item.id, { mastery: value as Mastery })}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(masteryLabels).map(([value, label]) => <SelectItem value={value} key={value}>{label}</SelectItem>)}</SelectContent></Select></div></div>
         <div className="mt-3"><p className="mb-1.5 text-xs text-muted-foreground">复习笔记</p><Textarea value={item.note} onChange={(event) => updateMistake(item.id, { note: event.target.value })} placeholder="记录新的理解…" className="min-h-20" /></div>
-        <div className="mt-auto flex items-center justify-between border-t pt-4 text-xs text-muted-foreground"><span>已复习 {item.attempts} 次</span><Button asChild size="sm"><Link href={"/solve?mistake=" + item.id}>再次练习</Link></Button></div>
+        <div className="mt-auto flex items-center justify-between border-t pt-4 text-xs text-muted-foreground"><span>已复习 {item.attempts} 次</span><Button asChild size="sm"><a href={"/solve?mistake=" + item.id}>再次练习</a></Button></div>
       </article>)}</section>}
     </main>
   );

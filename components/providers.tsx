@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { useMathLabStore } from "@/lib/store";
+import { useLearningStore } from "@/lib/learning-store";
 
 type ModelContext = {
   registerTool: (tool: {
@@ -18,9 +18,9 @@ type ModelContext = {
 };
 
 function RuntimeBridge() {
-  const router = useRouter();
   const hydrate = useMathLabStore((state) => state.hydrate);
-  useEffect(() => hydrate(), [hydrate]);
+  const hydrateLearning = useLearningStore((state) => state.hydrate);
+  useEffect(() => { hydrate(); hydrateLearning(); }, [hydrate, hydrateLearning]);
 
   useEffect(() => {
     const context = (document as Document & { modelContext?: ModelContext }).modelContext;
@@ -40,12 +40,14 @@ function RuntimeBridge() {
       execute(input) {
         const exampleId = (input as { exampleId?: string }).exampleId;
         if (!["example-quadratic", "example-derivative", "example-integral"].includes(exampleId ?? "")) throw new Error("未知示例");
-        router.push("/solve?example=" + encodeURIComponent(exampleId!));
+        // Full document navigation is intentional: client routing is unreliable in the hosted Vinext runtime.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.assign("/solve?example=" + encodeURIComponent(exampleId!));
         return { opened: exampleId };
       },
     }, { signal: lifecycle.signal })).catch(() => undefined);
     return () => lifecycle.abort();
-  }, [router]);
+  }, []);
   return <Toaster richColors position="top-center" />;
 }
 

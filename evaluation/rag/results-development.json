@@ -1,0 +1,1032 @@
+{
+  "measuredAtUTC": "2026-10-17T07:07:01.024848+00:00",
+  "split": "development",
+  "scope": "retrieval only; no generated-answer accuracy measurement",
+  "summary": {
+    "text": {
+      "cases": 20,
+      "meanRecallAt4": 0.9444,
+      "coverageAccuracy": 1.0,
+      "actualModes": {
+        "none": 2,
+        "text": 18
+      },
+      "medianRetrievalMs": 0.0,
+      "p95RetrievalMs": 0
+    },
+    "vector": {
+      "cases": 20,
+      "meanRecallAt4": 1.0,
+      "coverageAccuracy": 1.0,
+      "actualModes": {
+        "none": 2,
+        "vector": 18
+      },
+      "medianRetrievalMs": 19.0,
+      "p95RetrievalMs": 27
+    },
+    "hybrid": {
+      "cases": 20,
+      "meanRecallAt4": 1.0,
+      "coverageAccuracy": 1.0,
+      "actualModes": {
+        "hybrid": 18,
+        "none": 2
+      },
+      "medianRetrievalMs": 11.0,
+      "p95RetrievalMs": 16
+    }
+  },
+  "rows": [
+    {
+      "id": "D01",
+      "query": "导数为零的点一定是极值点吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "EXT-005",
+        "EXT-006",
+        "EXT-007",
+        "MON-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D02",
+      "query": "怎样使用链式法则对复合函数求导？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-015",
+        "DER-019",
+        "DER-016",
+        "DER-013"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D03",
+      "query": "函数可导就一定连续吗，连续是否一定可导？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-004",
+        "MON-009",
+        "EXT-005",
+        "MVT-003"
+      ],
+      "recallAt4": 0.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D04",
+      "query": "一阶导数从负变正能判断什么极值？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-004",
+        "MON-003",
+        "MON-009",
+        "MON-008"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D05",
+      "query": "闭区间上求最值为什么需要检查端点？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "EXT-009",
+        "EXT-011",
+        "EXT-010",
+        "MVT-002"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D06",
+      "query": "罗尔定理有哪些适用条件？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MVT-001",
+        "EXT-004",
+        "EXT-008",
+        "MVT-002"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D07",
+      "query": "拉格朗日中值定理连接了割线和切线吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MVT-002",
+        "MVT-001",
+        "MVT-003",
+        "DER-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D08",
+      "query": "两个函数相乘怎么求导？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-017",
+        "DER-011",
+        "DER-004",
+        "MON-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D09",
+      "query": "分式求导为什么分母要平方？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-018",
+        "DER-012",
+        "DER-013",
+        "DER-019"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D10",
+      "query": "二阶导数为零是不是就没有极值？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-007",
+        "MON-009",
+        "MON-006",
+        "MON-008"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D11",
+      "query": "切点的切线方程怎么写？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-002",
+        "EXT-005",
+        "DER-006",
+        "MVT-002"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D12",
+      "query": "用导数定义里的差商计算导数要注意什么？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-001",
+        "EXT-006",
+        "DER-015",
+        "EXT-011"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D13",
+      "query": "整个区间的导数大于零说明函数递增吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-001",
+        "MON-008",
+        "MVT-002",
+        "EXT-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D14",
+      "query": "局部极大值与整个区间最大值有什么区别？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "EXT-003",
+        "EXT-001",
+        "MON-004",
+        "EXT-009"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D15",
+      "query": "函数不可导的尖点可以有极小值吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "EXT-008",
+        "DER-006",
+        "EXT-006",
+        "MON-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D16",
+      "query": "拐点只需要二阶导数等于零吗？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MON-007",
+        "MON-009",
+        "MON-008",
+        "MON-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D17",
+      "query": "幂函数x的正整数次幂如何求导？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "DER-008",
+        "DER-016",
+        "DER-015",
+        "DER-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D18",
+      "query": "导数在区间上恒为零说明什么？",
+      "requestedMode": "text",
+      "actualMode": "text",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [
+        "MVT-003",
+        "EXT-009",
+        "EXT-010",
+        "MON-001"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D19",
+      "query": "条件概率的贝叶斯公式是什么？",
+      "requestedMode": "text",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D20",
+      "query": "矩阵的特征值怎么计算？",
+      "requestedMode": "text",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D01",
+      "query": "导数为零的点一定是极值点吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-007",
+        "EXT-008",
+        "EXT-004",
+        "MON-005"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 21,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D02",
+      "query": "怎样使用链式法则对复合函数求导？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-015",
+        "DER-019",
+        "DER-016",
+        "DER-008"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 21,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D03",
+      "query": "函数可导就一定连续吗，连续是否一定可导？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-005",
+        "DER-004",
+        "DER-006",
+        "DER-016"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 27,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D04",
+      "query": "一阶导数从负变正能判断什么极值？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-004",
+        "MON-003",
+        "MON-007",
+        "MON-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 26,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D05",
+      "query": "闭区间上求最值为什么需要检查端点？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-009",
+        "EXT-011",
+        "EXT-010",
+        "EXT-006"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 28,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D06",
+      "query": "罗尔定理有哪些适用条件？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-001",
+        "MVT-002",
+        "EXT-010",
+        "EXT-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 27,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D07",
+      "query": "拉格朗日中值定理连接了割线和切线吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-002",
+        "MVT-001",
+        "DER-002",
+        "EXT-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 19,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D08",
+      "query": "两个函数相乘怎么求导？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-011",
+        "DER-017",
+        "DER-014",
+        "DER-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 13,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D09",
+      "query": "分式求导为什么分母要平方？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-018",
+        "DER-012",
+        "DER-013",
+        "DER-016"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 26,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D10",
+      "query": "二阶导数为零是不是就没有极值？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-007",
+        "EXT-007",
+        "MON-006",
+        "MON-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 24,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D11",
+      "query": "切点的切线方程怎么写？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-002",
+        "DER-006",
+        "MVT-002",
+        "EXT-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 18,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D12",
+      "query": "用导数定义里的差商计算导数要注意什么？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-001",
+        "DER-018",
+        "DER-012",
+        "DER-013"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 24,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D13",
+      "query": "整个区间的导数大于零说明函数递增吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-001",
+        "MON-002",
+        "MVT-003",
+        "MVT-001"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 19,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D14",
+      "query": "局部极大值与整个区间最大值有什么区别？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-001",
+        "EXT-003",
+        "EXT-002",
+        "MON-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 15,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D15",
+      "query": "函数不可导的尖点可以有极小值吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-008",
+        "DER-006",
+        "EXT-004",
+        "MON-005"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 18,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D16",
+      "query": "拐点只需要二阶导数等于零吗？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-009",
+        "MON-007",
+        "EXT-007",
+        "MON-005"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 15,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D17",
+      "query": "幂函数x的正整数次幂如何求导？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-008",
+        "DER-014",
+        "DER-016",
+        "DER-013"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 19,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D18",
+      "query": "导数在区间上恒为零说明什么？",
+      "requestedMode": "vector",
+      "actualMode": "vector",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-003",
+        "MVT-001",
+        "DER-018",
+        "DER-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 18,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D19",
+      "query": "条件概率的贝叶斯公式是什么？",
+      "requestedMode": "vector",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D20",
+      "query": "矩阵的特征值怎么计算？",
+      "requestedMode": "vector",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D01",
+      "query": "导数为零的点一定是极值点吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-007",
+        "EXT-006",
+        "EXT-004",
+        "MON-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 16,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D02",
+      "query": "怎样使用链式法则对复合函数求导？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-015",
+        "DER-019",
+        "DER-016",
+        "DER-008"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 15,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D03",
+      "query": "函数可导就一定连续吗，连续是否一定可导？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-004",
+        "DER-005",
+        "DER-006",
+        "MVT-001"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 18,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D04",
+      "query": "一阶导数从负变正能判断什么极值？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-004",
+        "MON-003",
+        "MON-007",
+        "MON-005"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 11,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D05",
+      "query": "闭区间上求最值为什么需要检查端点？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-009",
+        "EXT-011",
+        "EXT-010",
+        "MVT-002"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 12,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D06",
+      "query": "罗尔定理有哪些适用条件？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-001",
+        "EXT-004",
+        "MVT-002",
+        "EXT-010"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 11,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D07",
+      "query": "拉格朗日中值定理连接了割线和切线吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-002",
+        "MVT-001",
+        "DER-002",
+        "DER-004"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 12,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D08",
+      "query": "两个函数相乘怎么求导？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-011",
+        "DER-017",
+        "DER-004",
+        "DER-014"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 10,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D09",
+      "query": "分式求导为什么分母要平方？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-018",
+        "DER-012",
+        "DER-013",
+        "DER-016"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 10,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D10",
+      "query": "二阶导数为零是不是就没有极值？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-007",
+        "MON-006",
+        "EXT-007",
+        "MON-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 11,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D11",
+      "query": "切点的切线方程怎么写？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-002",
+        "DER-006",
+        "MVT-002",
+        "EXT-005"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 10,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D12",
+      "query": "用导数定义里的差商计算导数要注意什么？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-001",
+        "DER-018",
+        "EXT-006",
+        "DER-012"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 11,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D13",
+      "query": "整个区间的导数大于零说明函数递增吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-001",
+        "MON-002",
+        "MVT-003",
+        "EXT-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 11,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D14",
+      "query": "局部极大值与整个区间最大值有什么区别？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-001",
+        "EXT-003",
+        "MON-004",
+        "EXT-009"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 11,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D15",
+      "query": "函数不可导的尖点可以有极小值吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "EXT-008",
+        "DER-006",
+        "EXT-006",
+        "MON-003"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 11,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D16",
+      "query": "拐点只需要二阶导数等于零吗？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MON-007",
+        "MON-009",
+        "MON-008",
+        "EXT-007"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 12,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D17",
+      "query": "幂函数x的正整数次幂如何求导？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "DER-008",
+        "DER-016",
+        "DER-014",
+        "DER-015"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 11,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D18",
+      "query": "导数在区间上恒为零说明什么？",
+      "requestedMode": "hybrid",
+      "actualMode": "hybrid",
+      "vectorStatus": "ready",
+      "retrievedIds": [
+        "MVT-003",
+        "MON-001",
+        "DER-004",
+        "MON-002"
+      ],
+      "recallAt4": 1.0,
+      "coverageCorrect": true,
+      "retrievalMs": 13,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D19",
+      "query": "条件概率的贝叶斯公式是什么？",
+      "requestedMode": "hybrid",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    },
+    {
+      "id": "D20",
+      "query": "矩阵的特征值怎么计算？",
+      "requestedMode": "hybrid",
+      "actualMode": "none",
+      "vectorStatus": "not_requested",
+      "retrievedIds": [],
+      "recallAt4": null,
+      "coverageCorrect": true,
+      "retrievalMs": 0,
+      "knowledgeBaseVersion": "derivatives-2026-10-17-v1"
+    }
+  ]
+}

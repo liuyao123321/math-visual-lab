@@ -19,11 +19,11 @@ export const examples: SolveResult[] = [
     commonMistakes: ["配方时常数项计算错误", "把顶点横坐标误写成 -2", "求出零点后未说明图像交点"],
     limitations: [],
     visualization: {
-      kind: "cartesian", title: "二次函数的零点与顶点", xLabel: "x", yLabel: "f(x)", xDomain: [-2, 6], yDomain: [-3, 10],
-      parameters: [{ key: "k", label: "常数项 k", min: 0, max: 6, step: 0.5, defaultValue: 3 }],
+      kind: "cartesian", title: "二次函数的零点与顶点", xLabel: "x", yLabel: "f(x)", xDomain: [-2, 6], yDomain: [-5, 10],
+      parameters: [],
       layers: [
-        { id: "curve", label: "函数曲线", type: "function", expression: "x^2-4*x+k", color: "#22d3ee" },
-        { id: "axis", label: "对称轴", type: "line", x: [2, 2], y: [-3, 10], color: "#94a3b8", dashed: true },
+        { id: "curve", label: "函数曲线", type: "function", expression: "x^2-4*x+3", color: "#22d3ee" },
+        { id: "axis", label: "对称轴", type: "line", x: [2, 2], y: [-5, 10], color: "#94a3b8", dashed: true },
         { id: "vertex", label: "顶点", type: "points", x: [2], y: [-1], color: "#f59e0b" },
         { id: "zeros", label: "零点", type: "points", x: [1, 3], y: [0, 0], color: "#22d3ee" },
       ],
@@ -44,11 +44,12 @@ export const examples: SolveResult[] = [
     visualization: {
       kind: "cartesian", title: "函数与动态切线", xLabel: "x", yLabel: "y", xDomain: [-3, 3], yDomain: [-8, 8],
       parameters: [{ key: "t", label: "切点 t", min: -2, max: 2, step: 0.1, defaultValue: 0 }],
+      interactiveParameters: [{ key: "t", reason: "观察不同位置的切线及其斜率", sourceQuote: "观察不同位置的切线变化" }],
       layers: [
         { id: "function", label: "f(x)", type: "function", expression: "x^3-3*x", color: "#22d3ee" },
         { id: "tangent", label: "切线", type: "function", expression: "(3*t^2-3)*(x-t)+(t^3-3*t)", color: "#f59e0b" },
         { id: "critical", label: "极值点", type: "points", x: [-1, 1], y: [2, -2], color: "#a78bfa" },
-        { id: "moving-point", label: "当前切点", type: "points", x: [0], y: [0], color: "#f59e0b" },
+        { id: "moving-point", label: "当前切点", type: "points", xExpressions: ["t"], yExpressions: ["t^3-3*t"], color: "#f59e0b" },
       ],
     },
   },
@@ -65,7 +66,7 @@ export const examples: SolveResult[] = [
     commonMistakes: ["忘记用上限值减下限值", "把面积误写成负数", "积分后指数增加但没有除以新指数"], limitations: [],
     visualization: {
       kind: "cartesian", title: "定积分与面积", xLabel: "x", yLabel: "f(x)", xDomain: [-0.5, 2.5], yDomain: [-0.5, 1.5],
-      parameters: [{ key: "b", label: "积分上限 b", min: 0.2, max: 2, step: 0.1, defaultValue: 2 }],
+      parameters: [],
       layers: [
         { id: "integrand", label: "被积函数", type: "function", expression: "2*x-x^2", color: "#22d3ee" },
         { id: "area", label: "积分区域", type: "area", expression: "2*x-x^2", domain: [0, 2], color: "#f59e0b" },

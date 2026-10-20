@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "textbooks": [
+    {
+      "id": "openstax-calculus-1",
+      "title": "OpenStax · Calculus Volume 1",
+      "subject": "高等数学",
+      "status": "available",
+      "coverage": "导数、单调性与极值（部分章节，非全书）",
+      "sourceIds": ["definition", "continuity", "rules", "chain", "extrema", "mean", "shape"]
+    }
+  ]
+}
