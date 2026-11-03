@@ -4,15 +4,15 @@
 
 ## 先确认你拿到的是哪一份代码
 
-本次核查：2026-11-03（北京时间）。编写本文前，本机已提交基线为 `383ff45`；本次发布范围仅为这份文档。**GitHub 克隆版和项目所有者电脑上的工作区不是同一份代码。** 本机还有未提交的功能改动，不能凭 GitHub 上的交接说明认定自己已拿到这些文件。
+本次核查：2026-11-03（北京时间）。**接手网页代码以 GitHub `main` 上的 `8031c9c` 或后续提交为基线。** 之前只在本机的网页改动已随该提交同步。同步代码不等于部署网站，也不会同步本机数据或运行配置。
 
 | 范围 | 能确认的内容 |
 | --- | --- |
-| 已提交基线 `383ff45` | 已有答疑、拍照入口、分步讲解、二维绘图、错题、学习报告、专项模拟、设置、课程知识检索等代码。可从 [README](README.md) 开始。 |
-| 本机另有未提交改动 | 查到题目照片分流与手写过程辅导、个人 PDF 导入及扫描识别相关更新、教材卡片核对、反馈和开发者统计、错题与答疑界面更新，以及三维绘图和单位球边界修复等。这里记录的是代码范围，不代表这些改动全部验收或发布。 |
-| 线上网站 | 本次未部署，也没有验证线上版本与任一 Git 状态一致。GitHub 提交不能作为线上部署成功的证据。 |
+| GitHub 网页代码 `8031c9c` | 已同步 116 个文件变更，包含三维绘图及单位球边界修复、图上参数拖动、个人 PDF 扫描识别与教材卡片核对、反馈与开发者统计，以及答疑与错题界面更新。可从 [README](README.md) 开始。 |
+| 本机工作区 | 本次更新文档前，已提交的网页代码与 GitHub 一致；旧 `HANDOFF.md` 仍有未提交修改。本机密钥、数据库、浏览器数据和生成产物没有上传。 |
+| 线上网站 | 代码同步和本次文档更新均未部署网站，未验证线上运行版本与 `8031c9c` 一致。 |
 
-若任务涉及本机改动，请使用项目所有者提供的现有工作区，或请其提供包含对应改动的提交/补丁。不要根据文档重写一份可能已经存在的功能。旧 [HANDOFF.md](HANDOFF.md) 保留了历史细节；里面的测试数量和“最新”标题必须结合日期与版本阅读。
+其他 AI 可以从 GitHub 克隆后接手代码。需要复现本机运行状态时，请按对应说明配置环境并使用独立测试数据。旧 [HANDOFF.md](HANDOFF.md) 保留了历史细节；里面的测试数量和“最新”标题必须结合日期与版本阅读。
 
 ## 接手后的第一步
 
@@ -27,7 +27,7 @@
 
 - 本机运行要求 Node.js 22.13 或更高版本。干净克隆后按 README 安装依赖，再执行 `npm run dev`，使用终端显示的地址。现有工作区如能运行，不必重新安装。不要跳过脚本直接启动 Vite，项目启动时会准备 PDF.js 所需的 Worker。
 - `npm test` 执行应用测试，`npx tsc --noEmit --incremental false` 检查类型，`npm run build` 验证生产构建，`npm run lint` 检查代码。按任务风险选择验证范围，记录实际结果。
-- 没有密钥时，先用内置二次函数、导数、定积分示例检查公式、步骤与图像、错题保存和报告变化。本机含三维改动时，再看三重积分示例的投影与立体切换。仅在项目所有者同意后使用专用演示密钥做真实模型测试。
+- 没有密钥时，先用内置二次函数、导数、定积分示例检查公式、步骤与图像、错题保存和报告变化，再用三重积分示例检查投影与立体切换。仅在项目所有者同意后使用专用演示密钥做真实模型测试。
 - 不把模拟请求、浏览器本地演示或构建成功写成真实 AI 正确率、手机实测或线上验收。课设文档中的响应时间、并发人数和存储容量是设计目标，除非已有对应实测。
 
 ## 找代码时从这里开始
@@ -36,10 +36,10 @@
 | --- | --- |
 | 首页、导航、答疑页与题目会话 | `app/page.tsx`、`app/solve/`、`components/app-shell.tsx`、`components/solve-workspace.tsx`、`lib/solve-session.ts` |
 | 模型请求、照片分流、补充条件与数据校验 | `app/api/tutor/route.ts`、`lib/tutor-client.ts`、`lib/math-schema.ts`；照片流程细节以实际工作区代码为准 |
-| 公式、二维绘图与步骤联动 | `lib/formula.ts`、`components/math-formula.tsx`、`components/math-plot.tsx`、`lib/visualization-policy.ts`；本机三维另见 `lib/spatial-plot.ts` |
+| 公式、二维与三维绘图、步骤联动 | `lib/formula.ts`、`components/math-formula.tsx`、`components/math-plot.tsx`、`lib/visualization-policy.ts`、`lib/spatial-plot.ts`；图上拖动另见 `lib/plot-point-control.ts` |
 | 错题、设置、报告、专项模拟 | `app/mistakes/`、`app/report/`、`app/practice/`、`app/settings/`、`lib/store.ts`、`lib/storage.ts`、`lib/learning-store.ts` |
-| 课程检索、个人教材 | `app/knowledge/`、`app/api/knowledge/route.ts`、`lib/rag/`；本机 PDF 路径看 `lib/pdf-textbook-import.ts` 和 `lib/personal-library.ts` |
-| 反馈和开发者统计（本机改动） | `app/feedback/`、`app/developer/`、`app/api/operations/`、`lib/operations/`、`db/schema.ts`、`OPERATIONS.md` |
+| 课程检索、个人教材 | `app/knowledge/`、`app/api/knowledge/route.ts`、`lib/rag/`、`lib/pdf-textbook-import.ts`、`lib/personal-library.ts`、`lib/textbook-cards.ts` |
+| 反馈和开发者统计 | `app/feedback/`、`app/developer/`、`app/api/operations/`、`lib/operations/`、`db/schema.ts`、[OPERATIONS.md](OPERATIONS.md) |
 
 文字/图片答疑通过本站 `/api/tutor` 调用模型。公式和绘图读取校验后的结构；图像失败时应保留文字解析。知识库引用须来自实际检索到的资料，来源核对不等于教师审核或数学证明。固定题目不要随意添加会改变原条件的滑块。
 
@@ -61,6 +61,12 @@
 如果本轮同时要求同步 GitHub，只暂存本文，核对提交范围后再推送；不要用 `git add -A`。若分支含未发布业务提交，不直接推整个分支；先确认远端基线，再隔离文档变更。推送后以远端分支或提交核对结果。
 
 ## 进度记录
+
+### 2026-11-03｜同步最新网页代码
+
+- 提交 `8031c9c`（`Sync latest math lab website source`）已推送并核对 GitHub `main`。这次包含 116 个文件变更，其他 AI 可从仓库获取这批代码。
+- 同步前完成 49 个测试文件、387 项自动化测试、TypeScript 检查和生产构建，均通过。构建仍提示部分打包文件较大。该轮没有验证线上部署、真实模型调用、实体手机或并发容量；本次只更新文档，没有重跑应用测试。
+- 后续按任务补测：拍照辅导重点看真实图片、识别核对和手机操作；三维重点看步骤联动和边界图像。需要上线时另行核实部署配置与环境，尤其是反馈和统计所需的数据库绑定及后台权限。
 
 ### 2026-11-03｜建立交接入口
 
