@@ -1,4 +1,7 @@
-// Intentionally empty by default.
-// Add Drizzle tables here when the site actually needs a database.
-// See examples/d1/db/schema.ts for an opt-in example.
-export {};
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+export const visitors = sqliteTable("operations_visitors", { id: text("id").primaryKey(), firstSeen: integer("first_seen").notNull(), lastSeen: integer("last_seen").notNull() });
+export const events = sqliteTable("operations_events", { id: text("id").primaryKey(), visitorId: text("visitor_id").notNull(), kind: text("kind").notNull(), path: text("path").notNull(), createdAt: integer("created_at").notNull() }, (table) => [index("operations_events_date").on(table.createdAt)]);
+export const requests = sqliteTable("operations_requests", { id: text("id").primaryKey(), visitorId: text("visitor_id").notNull(), action: text("action").notNull(), status: integer("status").notNull(), createdAt: integer("created_at").notNull(), durationMs: integer("duration_ms").notNull(), ragAttempted: integer("rag_attempted").notNull().default(0), ragMatched: integer("rag_matched").notNull().default(0), retrievalMode: text("retrieval_mode").notNull().default("none") }, (table) => [index("operations_requests_date").on(table.createdAt)]);
+export const feedback = sqliteTable("operations_feedback", { id: text("id").primaryKey(), submissionId: text("submission_id").notNull().unique(), requestHash: text("request_hash").notNull(), category: text("category").notNull(), title: text("title").notNull(), description: text("description").notNull(), steps: text("steps").notNull(), contact: text("contact").notNull(), page: text("page").notNull(), status: text("status").notNull().default("new"), note: text("note").notNull().default(""), version: integer("version").notNull().default(1), createdAt: integer("created_at").notNull(), updatedAt: integer("updated_at").notNull() }, (table) => [index("operations_feedback_date").on(table.createdAt)]);
+export const limits = sqliteTable("operations_limits", { key: text("key").primaryKey(), count: integer("count").notNull(), expiresAt: integer("expires_at").notNull() });

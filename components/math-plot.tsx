@@ -5,6 +5,9 @@ import { useTheme } from "next-themes";
 import { AlertTriangle } from "lucide-react";
 import type { VisualizationSpec } from "@/lib/math-schema";
 import { compileSafeExpression, evaluateExpression, sampleExpression } from "@/lib/math";
+import { createSpatialTraces } from "@/lib/spatial-plot";
+import { pointControls } from "@/lib/plot-point-control";
+import { PlotParameterHandle, type InteractivePlotElement } from "./plot-parameter-handle";
 
 export type PlotTrace = Record<string, unknown>;
 
@@ -33,6 +36,7 @@ function colorWithAlpha(color: string, alpha: number) {
 }
 
 export function createPlotTraces(spec: VisualizationSpec, parameters: Record<string, number>, activeIds: string[]) {
+  if (spec.kind === "space") return createSpatialTraces(spec, activeIds) as PlotTrace[];
   const traces: PlotTrace[] = [];
   const activeSet = new Set(activeIds);
   for (const layer of spec.layers) {
@@ -47,7 +51,6 @@ export function createPlotTraces(spec: VisualizationSpec, parameters: Record<str
       const x = validPoints.map((point) => point.x);
       const y = validPoints.map((point) => point.y);
       const trace: PlotTrace = {
-        uid: layer.id,
         x: layer.type === "area" ? [...x, x[x.length - 1], x[0]] : sampled.x,
         y: layer.type === "area" ? [...y, 0, 0] : sampled.y,
         type: "scatter",
@@ -72,8 +75,7 @@ export function createPlotTraces(spec: VisualizationSpec, parameters: Record<str
       const x = coordinates.map((point) => point.x);
       const y = coordinates.map((point) => point.y);
       traces.push({
-        uid: layer.id,
-        x, y, type: "scatter", mode: layer.type === "line" ? "lines" : "markers+text",
+        x, y, uid: layer.id, type: "scatter", mode: layer.type === "line" ? "lines" : "markers+text",
         text: layer.type === "points" ? coordinates.map((point) => `(${Number(point.x.toFixed(3))}, ${Number(point.y.toFixed(3))})`) : undefined,
         textposition: "top center",
         name: layer.label,
@@ -87,14 +89,19 @@ export function createPlotTraces(spec: VisualizationSpec, parameters: Record<str
   return traces;
 }
 
-export function MathPlot({ spec, parameters, activeLayerIds, compact = false, revisionKey }: { spec: VisualizationSpec; parameters: Record<string, number>; activeLayerIds: string[]; compact?: boolean; revisionKey?: string }) {
+export function MathPlot({ spec, parameters, activeLayerIds, compact = false, onParameterChange, onParameterStart }: {
+  spec: VisualizationSpec; parameters: Record<string, number>; activeLayerIds: string[]; compact?: boolean;
+  onParameterChange?: (key: string, value: number) => void; onParameterStart?: () => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const plotlyRef = useRef<typeof import("plotly.js-basic-dist-min").default | null>(null);
   const { resolvedTheme } = useTheme();
   const [runtimeError, setRuntimeError] = useState("");
+  const [readyPlot, setReadyPlot] = useState<InteractivePlotElement | null>(null);
+  const controls = useMemo(() => onParameterChange ? pointControls(spec, parameters, activeLayerIds) : [], [spec, parameters, activeLayerIds, onParameterChange]);
   const plotState = useMemo(() => {
     try {
-      for (const layer of spec.layers) if (layer.expression) compileSafeExpression(layer.expression, Object.keys(parameters));
+      if (spec.kind === "cartesian") for (const layer of spec.layers) if (layer.expression) compileSafeExpression(layer.expression, Object.keys(parameters));
       const traces = createPlotTraces(spec, parameters, activeLayerIds);
       return { traces, error: traces.length ? "" : "当前图像没有有效数据，文字解析仍可正常查看。" };
     } catch {
@@ -113,9 +120,10 @@ export function MathPlot({ spec, parameters, activeLayerIds, compact = false, re
     window.addEventListener("pointerup", removeDragCovers, true);
     window.addEventListener("pointercancel", removeDragCovers, true);
     window.addEventListener("mouseup", removeDragCovers, true);
-    import("plotly.js-basic-dist-min").then(async (module) => {
+    (spec.kind === "space" ? import("plotly.js-gl3d-dist-min") : import("plotly.js-basic-dist-min")).then(async (module) => {
       if (cancelled) return;
       plotly = module.default;
+      if (plotlyRef.current && plotlyRef.current !== plotly) plotlyRef.current.purge(element);
       plotlyRef.current = plotly;
       const styles = getComputedStyle(element);
       const ink = styles.getPropertyValue("--foreground").trim() || "#272620";
@@ -123,19 +131,27 @@ export function MathPlot({ spec, parameters, activeLayerIds, compact = false, re
       const axis = styles.getPropertyValue("--muted-foreground").trim() || "#69675f";
       await plotly.react(element, traces, {
         autosize: true,
-        uirevision: revisionKey ?? spec.title,
-        margin: { l: 48, r: 18, t: compact ? 20 : 45, b: 45 },
-        title: compact ? undefined : { text: spec.title, x: 0.03, font: { size: 15 } },
+        uirevision: `${spec.kind}:${spec.title}`,
+        margin: { l: 48, r: 18, t: 45, b: 45 },
+        title: { text: spec.title, x: 0.03, font: { size: 15 } },
         paper_bgcolor: "transparent",
         plot_bgcolor: "transparent",
         font: { color: ink, family: "Microsoft YaHei, sans-serif" },
-        xaxis: { title: spec.xLabel, range: spec.xDomain, gridcolor: grid, zerolinecolor: axis },
-        yaxis: { title: spec.yLabel, range: spec.yDomain, gridcolor: grid, zerolinecolor: axis },
+        ...(spec.kind === "space" ? { scene: {
+          aspectmode: "data", dragmode: "orbit",
+          xaxis: { title: { text: spec.xLabel }, gridcolor: grid },
+          yaxis: { title: { text: spec.yLabel }, gridcolor: grid },
+          zaxis: { title: { text: "z" }, range: spec.zDomain, gridcolor: grid },
+        } } : {
+          xaxis: { title: spec.xLabel, range: spec.xDomain, gridcolor: grid, zerolinecolor: axis },
+          yaxis: { title: spec.yLabel, range: spec.yDomain, gridcolor: grid, zerolinecolor: axis },
+        }),
         legend: { orientation: "h", y: -0.18, x: 0 },
         hovermode: "closest",
-        transition: { duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 180 },
+        transition: { duration: onParameterChange || window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 180 },
       }, { responsive: true, displaylogo: false, modeBarButtonsToRemove: ["lasso2d", "select2d"] });
-    }).catch(() => setRuntimeError("图像组件加载失败，请刷新页面重试。"));
+      if (!cancelled) setReadyPlot(element);
+    }).catch(() => { if (!cancelled) setRuntimeError(spec.kind === "space" ? "三维图像加载失败，请检查浏览器是否支持 WebGL。文字解析仍可查看。" : "图像组件加载失败，请刷新页面重试。"); });
     return () => {
       cancelled = true;
       window.removeEventListener("pointerup", removeDragCovers, true);
@@ -143,7 +159,7 @@ export function MathPlot({ spec, parameters, activeLayerIds, compact = false, re
       window.removeEventListener("mouseup", removeDragCovers, true);
       removeDragCovers();
     };
-  }, [traces, spec, resolvedTheme, revisionKey, compact]);
+  }, [traces, spec, resolvedTheme, onParameterChange]);
 
   useEffect(() => {
     const element = ref.current;
@@ -155,5 +171,8 @@ export function MathPlot({ spec, parameters, activeLayerIds, compact = false, re
   }, []);
 
   if (error || runtimeError) return <div className="m-5 flex min-h-72 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/8 p-6 text-center text-sm text-amber-700 dark:text-amber-200"><AlertTriangle className="mr-2 size-5" />{error || runtimeError}</div>;
-  return <div ref={ref} className={compact ? "h-[320px] min-h-[280px] w-full max-w-full overflow-hidden" : "h-[420px] min-h-[360px] w-full max-w-full overflow-hidden"} aria-label={spec.title} />;
+  return <div className="relative min-w-0">
+    <div ref={ref} className={compact ? "h-[320px] min-h-[280px] w-full max-w-full overflow-hidden" : "h-[420px] min-h-[360px] w-full max-w-full overflow-hidden"} aria-label={spec.title} />
+    {readyPlot && onParameterChange && controls.map((point) => <PlotParameterHandle key={point.layerId + ":" + point.parameter.key} plot={readyPlot} point={point} onChange={onParameterChange} onStart={onParameterStart} />)}
+  </div>;
 }

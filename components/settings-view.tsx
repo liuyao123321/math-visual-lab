@@ -77,6 +77,7 @@ export function SettingsView() {
       </section>
 
       <section className="mt-5 flex items-start gap-3 rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground"><AlertTriangle className="mt-0.5 size-4 shrink-0" /><p>AI 生成的数学解析可能出现错误。用于作业或考试复习时，请结合教材、教师讲解或独立计算进行核对。</p></section>
+      <section className="laboratory-panel mt-5 p-6"><h2 className="font-semibold">反馈与维护</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">网站记录匿名页面访问和功能使用次数，不自动收集题目、照片、个人教材或密钥。</p><div className="mt-4 flex flex-wrap gap-4"><a className="inline-flex min-h-11 items-center rounded-lg bg-primary px-4 text-sm text-primary-foreground" href="/feedback">提交问题反馈</a><a className="inline-flex min-h-11 items-center px-2 text-sm text-primary underline underline-offset-4" href="/developer">开发者控制台</a></div></section>
     </main>
   );
 }

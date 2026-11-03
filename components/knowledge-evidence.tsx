@@ -5,16 +5,19 @@ import { MathFormula, MathText } from "@/components/math-formula";
 import type { SolveResult } from "@/lib/math-schema";
 import type { EvidenceCard, RagSnapshot } from "@/lib/rag/schema";
 import { textbookCatalog } from "@/lib/textbooks";
+import { pageRangeLabel, textbookCardKinds } from "@/lib/textbook-cards";
 
 const labels = { satisfied: "满足", not_satisfied: "不满足", unknown: "尚未确认", not_applicable: "本处不适用" };
 function KnowledgeCard({ card }: { card: EvidenceCard }) {
+  const personal = "fileName" in card.source ? card.source : undefined;
   return <div className="mt-3 space-y-2 text-sm leading-6">
     <p><MathText value={card.statement} /></p>
     {card.formulas.map((formula) => <MathFormula key={formula} value={formula} />)}
     {card.conditions.length > 0 && <div><p className="font-medium">适用条件</p><ul className="list-disc space-y-1 pl-5">{card.conditions.map((condition) => <li key={condition.id}><MathText value={condition.text} /></li>)}</ul></div>}
     {card.pitfalls.map((pitfall) => <p key={pitfall} className="text-amber-800 dark:text-amber-200">提醒：<MathText value={pitfall} /></p>)}
-    {card.source.url ? <a href={card.source.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary underline underline-offset-4 dark:text-primary">{card.source.title} · {card.source.section}<ExternalLink className="size-3 shrink-0" /></a> : <p className="break-all text-muted-foreground">{"fileName" in card.source ? `${card.source.fileName} · PDF文件第${card.source.pageNumber}页（非印刷页码）` : "来源待核对"}</p>}
-    <p className="text-xs text-muted-foreground">{card.reviewStatus === "teacher_reviewed" ? "已由教师复核" : card.reviewStatus === "user_confirmed" ? "用户核对的原文摘录，未经教师复核" : "教材对照整理，待团队及教师复核"} · {card.id}</p>
+    {card.source.url ? <a href={card.source.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary underline underline-offset-4 dark:text-primary">{card.source.title} · {card.source.section}<ExternalLink className="size-3 shrink-0" /></a> : <p className="break-all text-muted-foreground">{personal ? `${personal.fileName} · PDF文件第${pageRangeLabel(personal.pageNumber, personal.pageEnd ?? personal.pageNumber)}页（非印刷页码）` : "来源待核对"}</p>}
+    {personal?.category && <p className="break-words text-xs text-muted-foreground">{personal.title} · {personal.section} · {textbookCardKinds[personal.category]} · v{personal.cardVersion}</p>}
+    <p className="break-all text-xs text-muted-foreground">{card.reviewStatus === "teacher_reviewed" ? "已由教师复核" : card.reviewStatus === "user_confirmed" ? personal?.category ? "用户核对的教材卡片，未经教师复核" : "用户核对的原文摘录，未经教师复核" : "教材对照整理，待团队及教师复核"} · {card.id}</p>
   </div>;
 }
 

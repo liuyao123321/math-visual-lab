@@ -313,6 +313,8 @@ describe("POST /api/tutor", () => {
     const body = JSON.parse(fetchMock.mock.calls[1][1].body);
     expect(body.messages[1].content).toContain("本次讲解模式：concise");
     expect(body.messages[1].content).toContain("本题无需图像");
+    expect(body.messages[1].content).toContain("答案卡");
+    expect(body.messages[1].content).toContain("不为凑短而跳过证明");
   });
 
   it("honors a requested detailed explanation while preserving the AI recommendation", async () => {
@@ -322,6 +324,19 @@ describe("POST /api/tutor", () => {
     const { data } = await response.json() as { data: import("@/lib/math-schema").SolveResult };
     expect(data).toMatchObject({ recommendedMode: "visual", explanationMode: "detailed" });
     expect(data.visualization).toBeUndefined();
+    const body = JSON.parse(fetchMock.mock.calls[1][1].body);
+    expect(body.messages[1].content).toContain("第一次学习此方法");
+    expect(body.messages[1].content).toContain("verification");
+    expect(body.messages[1].content).toContain("不输出内部思考");
+  });
+
+  it("preserves structured teaching fields through proxy validation", async () => {
+    const lesson = { ...examples[0], steps: [{ ...examples[0].steps[0], summary: "选用配方法", goal: "定位顶点", conditions: ["自变量为实数"], verification: "展开核对系数" }] };
+    vi.stubGlobal("fetch", solveMock(lesson));
+    const response = await POST(requestFor({ action: "solve", question: lesson.normalizedQuestion, mode: "detailed" }));
+    expect(response.status).toBe(200);
+    const { data } = await response.json() as { data: import("@/lib/math-schema").SolveResult };
+    expect(data.steps[0]).toMatchObject({ summary: "选用配方法", goal: "定位顶点", conditions: ["自变量为实数"], verification: "展开核对系数" });
   });
 
   it("preserves valid text when a graph has malformed configuration", async () => {

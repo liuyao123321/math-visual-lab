@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { useMathLabStore } from "@/lib/store";
 import { useLearningStore } from "@/lib/learning-store";
+import { UsageTracker } from "@/components/usage-tracker";
 
 type ModelContext = {
   registerTool: (tool: {
@@ -55,6 +56,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       {children}
+      <UsageTracker />
       <RuntimeBridge />
     </ThemeProvider>
   );

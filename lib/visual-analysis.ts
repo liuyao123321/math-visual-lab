@@ -5,7 +5,7 @@ import { appropriateVisualization } from "@/lib/visualization-policy";
 
 export function experimentReadouts(solution: SolveResult, parameters: Record<string, number>) {
   const spec = appropriateVisualization(solution);
-  if (!spec) return [];
+  if (!spec || spec.kind === "space") return [];
   solution = { ...solution, visualization: spec };
   parameters = Object.fromEntries(spec.parameters.map((item) => [item.key, parameters[item.key] ?? item.defaultValue]));
   const n = (value: number) => Number(value.toFixed(4)).toString();

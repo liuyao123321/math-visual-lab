@@ -11,6 +11,7 @@ import type { HandwritingRecognition } from "@/lib/handwriting-schema";
 import { readSolveSession, SOLVE_SESSION_KEY } from "@/lib/solve-session";
 import { questionAssessmentSchema } from "@/lib/math-schema";
 import * as photoInput from "@/lib/question-photo";
+import { TUTOR_MODE_EVENT } from "@/lib/tutor-navigation";
 
 const testState = vi.hoisted(() => ({
   params: {} as Record<string, string>,
@@ -38,6 +39,20 @@ vi.mock("@/lib/tutor-client", () => ({
 }));
 
 describe("SolveWorkspace tutoring flow", () => {
+  it("gives offline modes distinct content and restores the selected teaching style", async () => {
+    testState.params = { example: examples[0].id, mode: "concise" };
+    const page = render(<SolveWorkspace />);
+    expect(screen.getByText("用配方找顶点，用因式分解找零点。")).toBeInTheDocument();
+    expect(screen.queryByText("为什么这样做")).not.toBeInTheDocument();
+    act(() => { window.dispatchEvent(new CustomEvent(TUTOR_MODE_EVENT, { detail: { mode: "detailed" }, cancelable: true })); });
+    expect(screen.getAllByText("为什么这样做").length).toBeGreaterThan(0);
+    expect(screen.getByText("选择能直接读出目标信息的形式。")).toBeInTheDocument();
+    expect(testState.callTutor).not.toHaveBeenCalled();
+    await waitFor(() => expect(readSolveSession()?.mode).toBe("detailed"));
+    page.unmount(); testState.params = {}; render(<SolveWorkspace />);
+    expect(screen.getByText("选择能直接读出目标信息的形式。")).toBeInTheDocument();
+    expect(testState.callTutor).not.toHaveBeenCalled();
+  });
   it("blocks premature submit and ignores an older photo read after a new selection", async () => {
     let first!: (value: string) => void, second!: (value: string) => void;
     const read = vi.spyOn(photoInput, "readQuestionPhoto")
@@ -271,7 +286,8 @@ describe("SolveWorkspace tutoring flow", () => {
     render(<SolveWorkspace />);
     await screen.findByText("AI 推荐：简洁 · 只需移项。");
     expect(testState.callTutor).toHaveBeenCalledWith(expect.objectContaining({ mode: "auto" }), expect.objectContaining({ onNotice: expect.any(Function) }));
-    expect(screen.getByRole("tab", { name: "自动" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByLabelText("当前答疑方式")).toHaveTextContent("自动匹配");
+    expect(screen.queryByText("讲解方式")).not.toBeInTheDocument();
     expect(screen.queryByTestId("math-plot")).not.toBeInTheDocument();
     expect(screen.queryByText("实时可视化")).not.toBeInTheDocument();
   });
@@ -283,13 +299,75 @@ describe("SolveWorkspace tutoring flow", () => {
     testState.callTutor.mockResolvedValueOnce(result).mockResolvedValueOnce({ ...result, explanationMode: "detailed" });
     render(<SolveWorkspace />);
     await screen.findByText("AI 推荐：简洁 · 只需移项。");
-    fireEvent.mouseDown(screen.getByRole("tab", { name: "详细" }), { button: 0, ctrlKey: false });
+    act(() => { window.dispatchEvent(new CustomEvent(TUTOR_MODE_EVENT, { detail: { mode: "detailed" }, cancelable: true })); });
     await waitFor(() => expect(testState.callTutor).toHaveBeenCalledTimes(2));
     expect(testState.callTutor).toHaveBeenLastCalledWith(expect.objectContaining({ mode: "detailed", question: result.normalizedQuestion }), expect.objectContaining({ onNotice: expect.any(Function) }));
     await screen.findByText("当前采用：详细");
     fireEvent.change(screen.getByLabelText("数学题目"), { target: { value: "解方程 x+2=0" } });
-    expect(screen.getByRole("tab", { name: "自动" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByLabelText("当前答疑方式")).toHaveTextContent("详细答疑");
+    expect(readSolveSession()?.modeSelection).toBe("detailed");
     expect(screen.queryByText("当前采用：详细")).not.toBeInTheDocument();
+  });
+
+  it.each(["concise", "detailed", "visual"])("uses the %s navigation entry for a newly typed question", async (selection) => {
+    testState.params = { mode: selection };
+    testState.callTutor.mockResolvedValue({ ...examples[0], id: "generated", normalizedQuestion: "解方程 x+2=0" });
+    render(<SolveWorkspace />);
+    expect(screen.queryByText("讲解方式")).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("数学题目"), { target: { value: "解方程 x+2=0" } });
+    fireEvent.click(screen.getByRole("button", { name: "开始解析" }));
+    await waitFor(() => expect(testState.callTutor).toHaveBeenCalledTimes(1));
+    expect(testState.callTutor).toHaveBeenCalledWith(expect.objectContaining({ action: "solve", mode: selection, question: "解方程 x+2=0" }), expect.anything());
+  });
+
+  it("keeps an unsent question when entering a mode from another page", () => {
+    const first = render(<SolveWorkspace />);
+    fireEvent.change(screen.getByLabelText("数学题目"), { target: { value: "未提交的问题：证明调和级数发散。" } });
+    first.unmount();
+    testState.params = { mode: "concise" };
+    render(<SolveWorkspace />);
+    expect(screen.getByLabelText("数学题目")).toHaveValue("未提交的问题：证明调和级数发散。");
+    expect(screen.getByLabelText("当前答疑方式")).toHaveTextContent("简洁答疑");
+    expect(testState.callTutor).not.toHaveBeenCalled();
+  });
+
+  it("regenerates a restored AI lesson for a new navigation mode, but not again on refresh", async () => {
+    const result = { ...examples[0], id: "generated", normalizedQuestion: "解方程 x+1=0", recommendedMode: "concise", explanationMode: "concise", visualization: undefined };
+    testState.params = { question: result.normalizedQuestion, auto: "1" };
+    testState.callTutor.mockResolvedValueOnce(result).mockResolvedValueOnce({ ...result, explanationMode: "detailed" });
+    const first = render(<SolveWorkspace />);
+    await waitFor(() => expect(readSolveSession()?.solution?.id).toBe("generated"));
+    first.unmount();
+    testState.params = { mode: "detailed" };
+    const second = render(<SolveWorkspace />);
+    await waitFor(() => expect(testState.callTutor).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(readSolveSession()?.solution?.explanationMode).toBe("detailed"));
+    expect(testState.callTutor).toHaveBeenLastCalledWith(expect.objectContaining({ mode: "detailed", question: result.normalizedQuestion }), expect.anything());
+    second.unmount();
+    render(<SolveWorkspace />);
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 20)); });
+    expect(testState.callTutor).toHaveBeenCalledTimes(2);
+    expect(screen.getByLabelText("当前答疑方式")).toHaveTextContent("详细答疑");
+  });
+
+  it("keeps the uploaded image and caption when switching modes without reloading", async () => {
+    render(<SolveWorkspace />);
+    fireEvent.change(screen.getByLabelText("拍照或选择数学题图片"), { target: { files: [new File(["test"], "test.png", { type: "image/png" })] } });
+    const image = await screen.findByAltText("待识别题目预览");
+    fireEvent.change(screen.getByLabelText("数学题目"), { target: { value: "请检查图片中的第二步。" } });
+    act(() => { window.dispatchEvent(new CustomEvent(TUTOR_MODE_EVENT, { detail: { mode: "detailed" }, cancelable: true })); });
+    expect(screen.getByAltText("待识别题目预览")).toBe(image);
+    expect(screen.getByLabelText("数学题目")).toHaveValue("请检查图片中的第二步。");
+    expect(readSolveSession()?.modeSelection).toBe("detailed");
+    expect(testState.callTutor).not.toHaveBeenCalled();
+  });
+
+  it("ignores invalid navigation modes instead of sending them to the model", async () => {
+    testState.params = { mode: "invalid" };
+    render(<SolveWorkspace />);
+    act(() => { window.dispatchEvent(new CustomEvent(TUTOR_MODE_EVENT, { detail: { mode: "invalid" }, cancelable: true })); });
+    expect(readSolveSession()?.modeSelection).toBe("auto");
+    expect(testState.callTutor).not.toHaveBeenCalled();
   });
 
   it("shows a clarification without an answer or graph", async () => {

@@ -46,7 +46,10 @@ describe("learning center operations", () => {
     await waitFor(() => expect(useLearningStore.getState().data.sessions[0].submittedAt).not.toBeNull());
     expect(useLearningStore.getState().data.sessions[0].feedback).toEqual({});
     expect(useLearningStore.getState().data.activityDays).toHaveLength(1);
-    expect(screen.getByText("本次没有 AI 评价，请自行对照参考答案；有效学习打卡已记录。")).toBeInTheDocument();
+    expect(screen.getByText("已完成本次测验")).toBeInTheDocument();
+    expect(screen.queryByText(/本次没有 AI 评价/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/AI 判断：/)).not.toBeInTheDocument();
+    expect(screen.getAllByText("查看参考答案")).toHaveLength(5);
   });
   it("preserves legacy plans, materials and check-ins while creating a simulation", () => {
     useMathLabStore.getState().addMistake({ solution: examples[0], errorReason: "配方错误", note: "" });

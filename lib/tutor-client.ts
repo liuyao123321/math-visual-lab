@@ -5,6 +5,7 @@ import { handwritingRecognitionSchema, handwritingEvaluationSchema, handwritingH
 import { photoTutorResultSchema } from "@/lib/photo-tutoring";
 import { readTextbookSelection } from "@/lib/textbooks";
 import { readPersonalLibrary, searchPersonalExcerpts } from "@/lib/personal-library";
+import { usageHeaders } from "@/lib/usage-client";
 
 export class TutorError extends Error {
   constructor(message: string, public code: string, public status?: number) {
@@ -46,7 +47,7 @@ export async function callTutor(request: TutorRequest, options: { signal?: Abort
     }
     const response = await fetch("/api/tutor", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + key },
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + key, ...usageHeaders() },
       body: JSON.stringify(scopedRequest),
       signal: controller.signal,
     });

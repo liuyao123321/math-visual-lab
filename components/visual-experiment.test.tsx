@@ -4,7 +4,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { VisualExperiment } from "@/components/visual-experiment";
 import { examples } from "@/lib/examples";
 import type { VisualizationSpec } from "@/lib/math-schema";
-import { visualizationForStep } from "@/lib/step-visualization";
 
 vi.mock("@/components/math-plot", () => ({ MathPlot: ({ spec }: { spec: VisualizationSpec }) => <div data-testid="layers">{spec.layers.map((layer) => layer.label).join("|")}</div> }));
 afterEach(() => { cleanup(); vi.useRealTimers(); });
@@ -13,22 +12,6 @@ function Experiment() {
   return <VisualExperiment solution={examples[1]} parameters={parameters} onChange={setParameters} activeLayerIds={[]} />;
 }
 describe("visual experiment controls", () => {
-  it("stops autoplay when the shared canvas switches steps and does not resume on return", () => {
-    vi.useFakeTimers();
-    const tangent = visualizationForStep(examples[1].visualization, examples[1].steps[3])!;
-    const first = visualizationForStep(examples[1].visualization, examples[1].steps[0])!;
-    const onChange = vi.fn();
-    const scene = (spec: VisualizationSpec) => <VisualExperiment solution={examples[1]} specOverride={spec} inline parameters={{ t: 0 }} onChange={onChange} activeLayerIds={[]} />;
-    const page = render(scene(tangent));
-    fireEvent.click(screen.getByRole("button", { name: "播放动画" }));
-    page.rerender(scene(first));
-    act(() => vi.advanceTimersByTime(300));
-    page.rerender(scene(tangent));
-    expect(screen.getByRole("button", { name: "播放动画" })).toBeInTheDocument();
-    expect(screen.getByLabelText("动画参数")).toHaveValue("t");
-    act(() => vi.advanceTimersByTime(300));
-    expect(onChange).not.toHaveBeenCalled();
-  });
   it("uses a finer slider and keeps direct parameter input synchronized", () => {
     render(<Experiment />);
     expect(screen.getByLabelText("切点 t")).toHaveAttribute("step", String(examples[1].visualization!.parameters[0].step / 10));

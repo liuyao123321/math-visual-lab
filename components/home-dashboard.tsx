@@ -2,15 +2,13 @@
 
 import { useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
+import { useBrowserGSAP } from "./use-browser-gsap";
 import { HomeProductDemo } from "@/components/home-product-demo";
 
-gsap.registerPlugin(useGSAP);
 
 export function HomeDashboard() {
   const hero = useRef<HTMLElement>(null);
-  useGSAP(() => {
+  useBrowserGSAP((gsap) => {
     const media = gsap.matchMedia();
     // Without motion or JavaScript, the content remains in its readable final state.
     media.add("(prefers-reduced-motion: no-preference)", () => {

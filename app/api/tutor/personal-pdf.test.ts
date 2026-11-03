@@ -36,4 +36,25 @@ describe("private PDF answer evidence protocol", () => {
     }
     expect(mock).not.toHaveBeenCalled();
   });
+  it("round-trips reviewed card attribution without sending an exercise to the model", async () => {
+    const id = book.id + ":c1:v1";
+    const card = { ...excerpts[0], id, structured: { category: "knowledge", title: "矩阵乘法的维数条件", section: "矩阵运算", pageEnd: 4,
+      version: 1, formulas: ["A_{m\\times n}B_{n\\times p}"], conditions: ["左矩阵列数等于右矩阵行数"], noConditions: false } };
+    const exercise = { ...card, id: book.id + ":c2:v1", text: "课后题唯一标识：独立证明矩阵乘法满足结合律。", structured: { ...card.structured, category: "exercise" } };
+    const assessment = { classification: "complete", normalizedQuestion: query, message: "条件完整", missingInformation: [], recommendedMode: "detailed", modeReason: "说明条件", visualizationUseful: false };
+    const answer = { ...examples[0], normalizedQuestion: query, subject: "线性代数", questionType: "概念题", topics: ["矩阵乘法"],
+      visualization: undefined, finalAnswerLatex: "", finalAnswerText: "左矩阵的列数必须等于右矩阵的行数。",
+      steps: [{ ...examples[0].steps[0], title: "核对维数", explanation: "每个乘积元素来自一行与一列的内积，因此长度必须一致。",
+        formulas: [], basis: "矩阵乘法定义", visualLayerIds: [], knowledgeIds: [id], citationPurpose: "explain" }] };
+    const mock = vi.fn().mockResolvedValueOnce(upstream(assessment)).mockResolvedValueOnce(upstream(answer)); vi.stubGlobal("fetch", mock);
+    const response = await POST(req([card, exercise]));
+    expect(response.status).toBe(200);
+    const payload = await response.json() as { data: import("@/lib/math-schema").SolveResult };
+    expect(payload.data.rag?.usedKnowledgeIds).toEqual([id]);
+    expect(payload.data.rag?.cards[0]).toMatchObject({ reviewStatus: "user_confirmed", conditions: [{ text: "左矩阵列数等于右矩阵行数" }],
+      source: { pageNumber: 3, pageEnd: 4, category: "knowledge", cardVersion: 1, section: "矩阵运算" } });
+    const prompt = JSON.parse(mock.mock.calls[1][1].body).messages[1].content;
+    expect(prompt).toContain("矩阵乘法的维数条件");
+    expect(prompt).not.toContain("课后题唯一标识");
+  });
 });

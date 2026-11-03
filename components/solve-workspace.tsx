@@ -9,20 +9,21 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { MathFormula, MathText } from "@/components/math-formula";
 import { MathInputPreview } from "@/components/math-input-preview";
 import { PhotoUploadNotice } from "@/components/photo-upload-notice";
-import { LessonStory } from "@/components/lesson-story";
+import { StepVisualization } from "@/components/step-visualization";
 import { StepTutoringPanel, type StepFeedback } from "@/components/step-tutoring-panel";
 import { readQuestionPhoto } from "@/lib/question-photo";
 import { MultiMethodPanel } from "@/components/multi-method-panel";
 import { QuestionClarification } from "@/components/question-clarification";
 import { HandwritingWorkspace } from "@/components/handwriting-workspace";
-import { KnowledgeEvidence, StepKnowledgeEvidence } from "@/components/knowledge-evidence";
+import { KnowledgeEvidence } from "@/components/knowledge-evidence";
 import { clarificationQuestionsFor, type ClarificationDraft } from "@/lib/question-clarification";
 import { examples, exampleById } from "@/lib/examples";
+import { exampleExplanation } from "@/lib/example-explanations";
+import { SolutionStepContent } from "@/components/solution-step-content";
 import { defaultParameterValues } from "@/lib/math";
 import type { ExplainResult, ExplanationMode, ExplanationSelection, PracticeResult, SolveResult, TutoringStyle, UnderstandingCheck, UnderstandingFeedback } from "@/lib/math-schema";
 import { buildLearningContext, tutoringStyleLabels } from "@/lib/personalization";
@@ -36,6 +37,7 @@ import { solveResultSchema } from "@/lib/math-schema";
 import { useMathLabStore } from "@/lib/store";
 import { callTutor, TutorError } from "@/lib/tutor-client";
 import { cn } from "@/lib/utils";
+import { parseTutorMode, TUTOR_MODE_EVENT } from "@/lib/tutor-navigation";
 
 const modeLabels: Record<ExplanationMode, string> = { concise: "简洁", detailed: "详细", visual: "可视化" };
 const reasons = ["概念没有理解", "公式不会使用", "计算过程出错", "图像与公式联系不清", "其他"];
@@ -62,6 +64,7 @@ export function SolveWorkspace() {
   const customQuestion = searchParams.get("question");
   const autoStart = searchParams.get("auto") === "1";
   const handoffToken = searchParams.get("handoff");
+  const requestedMode = parseTutorMode(searchParams.get("mode"));
   const requestedEntryKey = handoffToken ? `handoff:${handoffToken}` : customQuestion ? `question:${customQuestion}` : mistakeId ? `mistake:${mistakeId}` : requestedExample ? `example:${requestedExample}` : "";
   const sessionEntryRef = useRef(requestedEntryKey);
   const sessionSnapshotRef = useRef<SolveSession | null>(null);
@@ -76,12 +79,14 @@ export function SolveWorkspace() {
   const practicedRef = useRef<string | null>(null);
   const autoStartedRef = useRef(false);
   const solveRef = useRef<() => Promise<void>>(async () => undefined);
+  const navigationModeRef = useRef<(selection: ExplanationMode) => void>(() => undefined);
+  const initialModeChangeRef = useRef<ExplanationMode | null>(null);
   const photoInputRef = useRef<HTMLInputElement | null>(null);
   const initial = (requestedExample && exampleById[requestedExample]) || (mistakeId && mistakes.find((item) => item.id === mistakeId)?.solution) || storeSolution || examples[0];
   const [question, setQuestion] = useState(customQuestion || initial.normalizedQuestion);
-  const [solution, setSolution] = useState<SolveResult>(initial);
-  const [mode, setMode] = useState<ExplanationMode>(initial.explanationMode ?? initial.recommendedMode ?? (initial.visualization ? "visual" : settings.defaultMode === "concise" ? "concise" : "detailed"));
-  const [modeSelection, setModeSelection] = useState<ExplanationSelection>("auto");
+  const [solution, setSolution] = useState<SolveResult>(() => exampleById[initial.id] && requestedMode ? exampleExplanation(initial, requestedMode) : initial);
+  const [mode, setMode] = useState<ExplanationMode>(requestedMode ?? initial.explanationMode ?? initial.recommendedMode ?? (initial.visualization ? "visual" : settings.defaultMode === "concise" ? "concise" : "detailed"));
+  const [modeSelection, setModeSelection] = useState<ExplanationSelection>(requestedMode ?? "auto");
   const [resultReady, setResultReady] = useState(!customQuestion && !handoffToken && solveResultSchema.safeParse(initial).success);
   const [tutoringStyleOverride, setTutoringStyleOverride] = useState<TutoringStyle | null>(null);
   const [progressCount, setProgressCount] = useState(0);
@@ -90,7 +95,7 @@ export function SolveWorkspace() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [errorCode, setErrorCode] = useState("");
-  const [mobileView, setMobileView] = useState("input");
+  const [mobileView, setMobileView] = useState(requestedExample === "example-triple-integral" ? "steps" : "input");
   const [errorReason, setErrorReason] = useState(reasons[0]);
   const [note, setNote] = useState("");
   const [detailReason, setDetailReason] = useState("我不理解这一步为什么这样变形");
@@ -117,13 +122,14 @@ export function SolveWorkspace() {
       ? solution.steps.length
       : Math.min(solution.steps.length, Math.max(progressCount, tutoringStyle === "guided" ? 1 : 0));
   const completedFlow = solution.steps.length === 0 || revealedCount >= solution.steps.length;
-  const visibleSteps = useMemo(() => solution.steps.slice(0, revealedCount), [solution.steps, revealedCount]);
+  const visibleSteps = solution.steps.slice(0, revealedCount);
   const step = visibleSteps[activeStep];
   const visual = useMemo(() => appropriateVisualization(solution), [solution]);
   const statusText = solution.status === "solved" ? "解析完成" : solution.status === "needs_more_info" ? "需要补充条件" : "暂不支持";
   const showResult = resultReady && question.trim() === solution.normalizedQuestion.trim();
   const showPlot = showResult && solution.status === "solved" && mode === "visual" && Boolean(visual);
   solveRef.current = () => solve();
+  navigationModeRef.current = changeMode;
 
   // Restore after hydration, before auto-start, practice counting or draft writes.
   // Plain /solve resumes the last draft; a DIFFERENT explicit entry opens a new task.
@@ -135,7 +141,8 @@ export function SolveWorkspace() {
     if (saved && !handoffToken && (!requestedEntryKey || saved.entryKey === requestedEntryKey)) {
       sessionEntryRef.current = saved.entryKey;
       setQuestion(saved.question); setSolution(saved.solution ?? examples[0]); setStoreSolution(saved.resultReady ? saved.solution : null);
-      setResultReady(saved.resultReady); setMode(saved.mode); setModeSelection(saved.modeSelection);
+      setResultReady(saved.resultReady); setMode(saved.mode); setModeSelection(requestedMode ?? saved.modeSelection);
+      if (requestedMode && requestedMode !== saved.mode && saved.resultReady && saved.solution?.status === "solved") initialModeChangeRef.current = requestedMode;
       setTutoringStyleOverride(saved.tutoringStyle); setProgressCount(saved.progressCount); setActiveStep(saved.activeStep);
       setParameters(saved.parameters); setMobileView(saved.mobileView === "visual" ? "steps" : saved.mobileView); setErrorReason(saved.errorReason); setNote(saved.note);
       setDetailReason(saved.detailReason); setDetail(saved.detail);
@@ -161,6 +168,23 @@ export function SolveWorkspace() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  useEffect(() => {
+    if (!sessionReady) return;
+    const selectMode = (event: Event) => {
+      const selection = parseTutorMode((event as CustomEvent<{ mode?: unknown }>).detail?.mode);
+      if (!selection) return;
+      event.preventDefault();
+      navigationModeRef.current(selection);
+    };
+    window.addEventListener(TUTOR_MODE_EVENT, selectMode);
+    const timer = window.setTimeout(() => {
+      const selection = initialModeChangeRef.current;
+      initialModeChangeRef.current = null;
+      if (selection) navigationModeRef.current(selection);
+    }, 0);
+    return () => { window.removeEventListener(TUTOR_MODE_EVENT, selectMode); window.clearTimeout(timer); };
+  }, [sessionReady]);
 
   const sessionSnapshot: SolveSession = {
     version: 1, entryKey: sessionEntryRef.current, question,
@@ -291,8 +315,8 @@ export function SolveWorkspace() {
 
   function solveQuestionOnly(text: string) {
     setPhotoReview(null); setAnswerMethod("standard"); setPhoto(null);
-    setQuestion(text); setModeSelection("auto");
-    void solve("auto", text);
+    setQuestion(text);
+    void solve(modeSelection, text);
   }
 
   function showError(caught: unknown, fallback: string) {
@@ -338,19 +362,28 @@ export function SolveWorkspace() {
   function confirmClarification(confirmedQuestion: string) {
     if (loading) return;
     setQuestion(confirmedQuestion);
-    setModeSelection("auto");
     setPhoto(null);
     if (photoInputRef.current) photoInputRef.current.value = "";
-    void solve("auto", confirmedQuestion);
+    void solve(modeSelection, confirmedQuestion);
   }
 
-  function changeMode(value: string) {
-    const selection = value as ExplanationSelection;
+  function changeMode(selection: ExplanationMode) {
+    if (loading || photoReading || answerMethod === "handwriting" || photoReview) {
+      toast.message(answerMethod === "handwriting" || photoReview ? "请先完成解题过程核对，或返回普通答疑后切换。" : "当前请求正在进行，请完成后再切换答疑方式。");
+      return;
+    }
+    const url = new URL(window.location.href);
+    url.searchParams.set("mode", selection);
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
     setModeSelection(selection);
-    setMode(selection === "auto" ? solution.explanationMode ?? solution.recommendedMode ?? (visual ? "visual" : "detailed") : selection);
+    setMode(selection);
+    if (showResult && solution.status === "solved" && exampleById[solution.id]) {
+      const next = exampleExplanation(solution, selection);
+      setSolution(next); setStoreSolution(next);
+    }
     // Existing AI lessons are genuinely regenerated, not merely relabelled.
     // Offline examples remain available without calling a paid service.
-    if (showResult && solution.status === "solved" && !exampleById[solution.id] && !loading) void solve(selection);
+    if (showResult && solution.status === "solved" && !exampleById[solution.id] && mode !== selection) void solve(selection);
   }
 
   function changeTutoringStyle(value: TutoringStyle) {
@@ -449,10 +482,10 @@ export function SolveWorkspace() {
   if (!sessionReady) return <main className="mx-auto max-w-[1540px] p-8 text-muted-foreground" role="status">正在恢复本次答疑…</main>;
 
   return (
-    <main className="solve-workspace mx-auto max-w-[1664px] px-4 py-6 lg:px-8 lg:py-8">
+    <main className="solve-workspace mx-auto max-w-[1440px] px-4 py-6 lg:px-8 lg:py-8">
       <div className="mb-5 flex flex-col justify-between gap-3 md:flex-row md:items-end">
-        <div><p className="mb-1 text-sm font-medium text-primary dark:text-primary">智能答疑工作台</p><h1 className="max-w-5xl text-2xl font-semibold tracking-tight md:text-3xl">把题目变成看得见的推理</h1></div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground"><span className={cn("size-2 rounded-full", hasKey ? "bg-emerald-500" : "bg-amber-500")} />{hasKey ? "DeepSeek 已配置" : <><span>当前可使用内置示例</span><a className="font-medium text-primary underline-offset-4 hover:underline" href="/settings">配置密钥</a></>}</div>
+        <div><p className="mb-1 text-sm font-medium text-primary dark:text-primary">智能答疑工作台</p><h1 className="text-2xl font-semibold tracking-tight md:text-3xl">把题目变成看得见的推理</h1></div>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"><a className="font-medium text-primary underline-offset-4 hover:underline" href="/solve?example=example-triple-integral&mode=visual">试用三重积分示例</a><span aria-hidden="true">·</span><span className={cn("size-2 rounded-full", hasKey ? "bg-emerald-500" : "bg-amber-500")} />{hasKey ? "DeepSeek 已配置" : <><span>当前可使用内置示例</span><a className="font-medium text-primary underline-offset-4 hover:underline" href="/settings">配置密钥</a></>}</div>
       </div>
 
       {answerMethod === "handwriting" ? <>
@@ -476,12 +509,12 @@ export function SolveWorkspace() {
 
       <div className="solve-layout grid items-start gap-6">
         <Card className={cn("solve-input min-w-0 gap-0 py-0", mobileView !== "input" && "hidden lg:flex")}>
-          <CardHeader className="border-b py-4"><CardTitle className="flex items-center gap-2 text-base"><BookOpenCheck className="size-4 text-primary" />题目输入</CardTitle></CardHeader>
+          <CardHeader className="border-b py-4"><CardTitle className="flex flex-wrap items-center gap-2 text-base"><BookOpenCheck className="size-4 text-primary" />题目输入<span aria-label="当前答疑方式" className="ml-auto text-xs font-normal text-muted-foreground">{modeSelection === "auto" ? "自动匹配" : modeLabels[modeSelection] + "答疑"}</span></CardTitle></CardHeader>
           <CardContent className="space-y-4 p-5">
             <Textarea value={question} maxLength={2000} disabled={loading} spellCheck={false} onPaste={(event) => { const image = Array.from(event.clipboardData.files).find((file) => file.type.startsWith("image/")); if (image) { event.preventDefault(); void selectPhoto(image); } }} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") { event.preventDefault(); void solve(); } }} onChange={(event) => {
               setQuestion(event.target.value);
               setPhotoReview(null);
-              if (resultReady) { setResultReady(false); setModeSelection("auto"); }
+              if (resultReady) setResultReady(false);
             }} className="min-h-36 resize-none text-base leading-7" aria-label="数学题目" placeholder="例如：求函数 f(x)=x²-4x+3 的零点与顶点。" />
             <MathInputPreview value={question} />
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={ragEnabled} disabled={loading} onChange={(event) => setRagEnabled(event.target.checked)} />使用课程知识库辅助解题</label>
@@ -491,10 +524,9 @@ export function SolveWorkspace() {
             <PhotoUploadNotice />
 
             <div className="grid gap-3">
-              <div><p className="mb-2 text-sm text-muted-foreground">讲解方式</p><Tabs value={modeSelection} onValueChange={changeMode}><TabsList className="grid w-full grid-cols-4"><TabsTrigger value="auto" disabled={loading}>自动</TabsTrigger>{Object.entries(modeLabels).map(([value, label]) => <TabsTrigger key={value} value={value} disabled={loading}>{label}</TabsTrigger>)}</TabsList></Tabs></div>
               <label><span className="mb-2 block text-sm text-muted-foreground">辅导方式</span><Select value={tutoringStyle} onValueChange={(value) => changeTutoringStyle(value as TutoringStyle)}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(tutoringStyleLabels).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select></label>
             </div>
-            {showResult && solution.status === "solved" && solution.recommendedMode && <p className="text-sm leading-6 text-muted-foreground">AI 推荐：{modeLabels[solution.recommendedMode]} · {solution.modeReason}{solution.explanationMode !== solution.recommendedMode && <span className="block">当前采用：{modeLabels[mode]}</span>}</p>}
+            {showResult && solution.status === "solved" && solution.recommendedMode && <p className="text-sm leading-6 text-muted-foreground">{exampleById[solution.id] ? "示例推荐" : "AI 推荐"}：{modeLabels[solution.recommendedMode]}{solution.modeReason && ` · ${solution.modeReason}`}{solution.explanationMode !== solution.recommendedMode && <span className="block">当前采用：{modeLabels[mode]}</span>}</p>}
             {showResult && !exampleById[solution.id] && solution.status === "solved" && <p className="text-sm text-muted-foreground">切换讲解方式会重新调用 AI 生成解析。</p>}
             <Button size="lg" className="w-full" onClick={() => void solve()} disabled={loading || photoReading || !!photoReview}>{photoReading ? <><Loader2 className="animate-spin" />正在读取图片…</> : loading ? <><Loader2 className="animate-spin" />{photo ? "正在识别图片并选择辅导方式" : "正在核对题目并生成解析"}</> : <>{photo ? "识别并解析" : "开始解析"}</>}</Button>
           </CardContent>
@@ -505,24 +537,21 @@ export function SolveWorkspace() {
           <CardContent className="p-5">
             {!showResult ? <div role="status" className="flex min-h-32 items-center justify-center gap-2 text-sm text-muted-foreground">{loading ? <><Loader2 className="size-4 animate-spin" />先核对题目条件，再生成合适的讲解。</> : error ? "本次未获得有效解析。输入已保留，可修改或重试。" : "提交题目后显示解析。"}</div> : <>
             <p className="mb-4 text-sm leading-6"><MathText value={solution.normalizedQuestion} /></p>
+            {solution.status === "solved" && <p role="status" className="mb-4 text-sm text-muted-foreground">{mode === "concise" ? "简洁答疑 · 关键操作、必要条件与结论；可按需展开说明。" : mode === "detailed" ? "详细答疑 · 逐步理解目标、推理依据与自检方法。" : "可视化答疑 · 结合必要图像理解每一步。"}</p>}
             {solution.rag && <KnowledgeEvidence rag={solution.rag} />}
             {solution.status === "solved" && completedFlow && <MultiMethodPanel key={solution.id} solution={solution} learningContext={learningContext} />}
             {solution.status !== "solved" && <div role="status" className="mb-4 rounded-xl bg-amber-500/8 p-4 text-sm text-amber-800 dark:text-amber-200"><p><MathText value={solution.inputAssessment?.classification !== "complete" && solution.inputAssessment?.message || solution.limitations.join("；") || "请补充题目条件后重新提交。"} /></p></div>}
             {solution.status === "needs_more_info" && <QuestionClarification question={solution.normalizedQuestion} questions={clarificationQuestionsFor(solution)} value={clarificationDraft} onChange={setClarificationDraft} onConfirm={confirmClarification} disabled={loading} />}
             {solution.status === "solved" && solution.steps.length > 0 && <div className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-muted/45 px-4 py-3 text-sm"><span>{tutoringStyleLabels[tutoringStyle]}</span><span className="text-muted-foreground">已展开 {revealedCount}/{solution.steps.length} 步</span></div>}
             {solution.status === "solved" && revealedCount === 0 && <div className="rounded-xl border border-primary/25 bg-primary/[0.05] p-5"><p className="flex items-center gap-2 text-sm font-medium text-primary dark:text-primary"><Lightbulb className="size-4" />先想一想</p><p className="mt-3 text-sm leading-7">这是一道关于“{solution.topics.join("、")}”的题。你准备从哪个已知条件或基本公式开始？</p>{solution.steps[0]?.basis && <p className="mt-3 text-xs leading-5 text-muted-foreground">小提示：回忆 <MathText value={solution.steps[0].basis} /></p>}<Button className="mt-4 w-full" variant="secondary" onClick={revealNextStep}>查看第一步</Button></div>}
-            <LessonStory solution={solution} steps={visibleSteps} spec={showPlot ? visual : undefined} activeIndex={activeStep} onActivate={setActiveStep} parameters={parameters} onParametersChange={setParameters} renderStep={(item, index, { active, activate, plot }) => <article key={solution.id + ":" + item.id} className="lesson-step" data-story-step={index} data-active={active ? "true" : "false"} data-step-id={item.id} aria-label={`第${index + 1}步：${item.title}`}>
-              <div className="flex items-start gap-3"><span className="step-number">{index + 1}</span><h2 className="min-w-0 text-xl font-medium"><button type="button" className="story-step-title" onClick={activate} aria-pressed={active}><MathText value={item.title} /></button></h2></div>
-              <div className="mt-4 space-y-3"><p className="text-sm leading-7"><MathText value={item.explanation} /></p>{item.formulas.map((formula) => <MathFormula key={formula} value={formula} />)}
-                <StepKnowledgeEvidence step={item} rag={solution.rag} />
-                {mode !== "concise" && item.basis && <p className="text-sm text-muted-foreground">依据：<MathText value={item.basis} /></p>}
-                {mode !== "concise" && item.commonMistake && <p className="rounded-lg bg-muted p-3 text-sm">易错提醒：<MathText value={item.commonMistake} /></p>}
-              </div>
-              {plot}
+            <div className={cn("lesson-steps", mode === "concise" ? "space-y-3" : "space-y-6")}>{visibleSteps.map((item, index) => <article key={solution.id + ":" + item.id} className="lesson-step" data-step-id={item.id} aria-label={`第${index + 1}步：${item.title}`}>
+              <div className="flex items-start gap-3"><span className="step-number">{index + 1}</span><h2 className="min-w-0 text-lg font-medium"><MathText value={item.title} /></h2></div>
+              <SolutionStepContent step={item} mode={mode} rag={solution.rag} />
+              {showPlot && visual && <StepVisualization solution={solution} spec={visual} step={item} parameters={parameters} onChange={setParameters} />}
               <StepTutoringPanel step={item} question={solution.normalizedQuestion} mode={mode} learningContext={learningContext}
                 value={stepFeedback[item.id] ?? { reason: "我不理解这一步为什么这样变形", detail: null }}
-                onFocus={activate} onChange={(next) => { setStepFeedback((previous) => ({ ...previous, [item.id]: next })); setDetailReason(next.reason); setDetail(next.detail); }} />
-            </article>} />
+                onFocus={() => setActiveStep(index)} onChange={(next) => { setStepFeedback((previous) => ({ ...previous, [item.id]: next })); setDetailReason(next.reason); setDetail(next.detail); }} />
+            </article>)}</div>
             {solution.status === "solved" && revealedCount > 0 && !completedFlow && <div className="mt-4 grid gap-2 sm:grid-cols-2"><Button variant="outline" onClick={() => explainStep("hint-only")} disabled={!step || secondaryLoading === "detail"}>{secondaryLoading === "detail" ? <Loader2 className="animate-spin" /> : <Lightbulb />}给更小提示</Button><Button onClick={revealNextStep}><Check />我理解了，继续</Button></div>}
             {solution.status === "solved" && completedFlow && <div className="mt-5 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] p-4"><p className="mb-2 flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-300"><Check className="size-4" />最终答案</p>{solution.finalAnswerLatex && <MathFormula value={solution.finalAnswerLatex} />}{solution.finalAnswerText && <p className="text-sm leading-7"><MathText value={solution.finalAnswerText} /></p>}</div>}
 

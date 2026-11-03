@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HomeDashboard } from "@/components/home-dashboard";
 
-vi.mock("@gsap/react", () => ({ useGSAP: vi.fn() }));
+vi.mock("./use-browser-gsap", () => ({ useBrowserGSAP: vi.fn() }));
 vi.mock("gsap", () => ({ gsap: { registerPlugin: vi.fn() } }));
 beforeEach(() => {
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));

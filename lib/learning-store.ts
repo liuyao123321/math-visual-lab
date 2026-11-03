@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { trackUsage } from "@/lib/usage-client";
 import { learningDataSchema, type LearningData, type PaperSession, type ReviewPlan } from "@/lib/learning-schema";
 import type { MaterialAnalysis, UnderstandingFeedback } from "@/lib/math-schema";
 import { localDay } from "@/lib/learning";
@@ -33,6 +34,6 @@ export const useLearningStore = create<State>((set, get) => {
       return { ...session, answers: { ...session.answers, [questionId]: text.slice(0, 1200) }, feedback };
     }) }),
     grade: (id, questionId, feedback) => save({ sessions: current().sessions.map((session) => session.id === id ? { ...session, feedback: { ...session.feedback, [questionId]: feedback } } : session) }),
-    submit: (id) => { save({ sessions: current().sessions.map((session) => session.id === id ? { ...session, submittedAt: new Date().toISOString() } : session) }); get().activity(); },
+    submit: (id) => { const session = current().sessions.find((item) => item.id === id); if (!session || session.submittedAt) return; save({ sessions: current().sessions.map((item) => item.id === id ? { ...item, submittedAt: new Date().toISOString() } : item) }); get().activity(); trackUsage("practice_submitted", "/practice"); },
   };
 });

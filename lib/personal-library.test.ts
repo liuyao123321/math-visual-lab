@@ -18,6 +18,21 @@ describe("personal PDF library", () => {
     expect(() => savePersonalBook({ ...book, id: "local-pdf-22222222-2222-4222-8222-222222222222" })).toThrow("已经导入");
     expect(readPersonalLibrary().books).toEqual([book]);
   });
+  it("round-trips 600 pages without truncation and preserves high original page numbers", () => {
+    const large = { ...book, pages: Array.from({ length: 600 }, (_, index) => ({ pageNumber: index + 10001, text: book.pages[0].text.repeat(10) })) };
+    savePersonalBook(large);
+    expect(readPersonalLibrary().books[0]).toEqual(large);
+    const hits = searchPersonalExcerpts("矩阵乘法", readPersonalLibrary().books);
+    const result = mergePersonalEvidence(emptyPersonalSnapshot([book.id]), "矩阵乘法", hits, [book.id]);
+    expect(result.cards[0].source).toMatchObject({ pageNumber: 10001 });
+    expect(ragSnapshotSchema.safeParse(result).success).toBe(true);
+  });
+  it("rejects oversized text without changing the existing library", () => {
+    savePersonalBook(book);
+    const before = localStorage.getItem(PERSONAL_LIBRARY_KEY);
+    expect(() => savePersonalBook({ ...book, id: "local-pdf-22222222-2222-4222-8222-222222222222", pages: Array.from({ length: 10 }, (_, index) => ({ pageNumber: index + 1, text: "x".repeat(160000) })) })).toThrow("150万字符");
+    expect(localStorage.getItem(PERSONAL_LIBRARY_KEY)).toBe(before);
+  });
   it("keeps original data when storage is corrupt or quota is exceeded", () => {
     localStorage.setItem(PERSONAL_LIBRARY_KEY, "broken");
     expect(() => savePersonalBook(book)).toThrow("未删除");

@@ -5,13 +5,14 @@
 import { usePathname } from "next/navigation";
 import { FlaskConical, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TutorNavigation } from "@/components/tutor-navigation";
 
 const navItems = [
-  { href: "/solve", label: "智能答疑" },
   { href: "/knowledge", label: "课程知识检索" },
   { href: "/mistakes", label: "错题集" },
   { href: "/report", label: "学习报告" },
   { href: "/practice", label: "专项模拟" },
+  { href: "/feedback", label: "问题反馈" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -25,6 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span>知数实验室</span>
           </a>
           <nav className="site-navigation" aria-label="主导航">
+            <TutorNavigation active={pathname.startsWith("/solve")} />
             {navItems.map(({ href, label }) => <a key={href} href={href} aria-current={pathname.startsWith(href) ? "page" : undefined}>{label}</a>)}
           </nav>
           <a href="/settings" className="site-settings" aria-current={pathname.startsWith("/settings") ? "page" : undefined}>

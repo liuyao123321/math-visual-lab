@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
+import { useBrowserGSAP } from "./use-browser-gsap";
+import type { gsap } from "gsap";
 import { ArrowUp, BookOpen, Check, ChevronRight, FlaskConical, Maximize2, Pause, Play, RotateCcw, Search, Sparkles } from "lucide-react";
 import "./home-product-demo.css";
 
-gsap.registerPlugin(useGSAP);
 
 const chapters = [
   { label: "输入问题", at: 0 },
@@ -41,7 +40,7 @@ export function HomeProductDemo() {
     return () => preference.removeEventListener("change", update);
   }, []);
 
-  useGSAP(() => {
+  useBrowserGSAP((gsap) => {
     if (reducedMotion || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const section = root.current;
     if (!section) return;

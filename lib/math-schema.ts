@@ -99,10 +99,12 @@ export const graphParameterSchema = z.object({
   defaultValue: z.number(),
 });
 
+const boundExpressions = z.tuple([z.string().min(1).max(200), z.string().min(1).max(200)]);
+const spatialRange = z.tuple([z.number().finite(), z.number().finite()]).refine(([min, max]) => min < max);
 export const graphLayerSchema = z.object({
   id: z.string().min(1).max(40),
   label: z.string().min(1).max(60),
-  type: z.enum(["function", "line", "points", "area"]),
+  type: z.enum(["function", "line", "points", "area", "surface", "solid"]),
   expression: z.string().max(200).optional(),
   x: z.array(z.number()).max(30).optional(),
   y: z.array(z.number()).max(30).optional(),
@@ -112,18 +114,36 @@ export const graphLayerSchema = z.object({
   domainExpressions: z.tuple([z.string().min(1).max(200), z.string().min(1).max(200)]).optional(),
   color: z.string().max(30).optional(),
   dashed: z.boolean().optional(),
+  yBounds: boundExpressions.optional(),
+  zBounds: boundExpressions.optional(),
 });
 
 export const visualizationSpecSchema = z.object({
-  kind: z.literal("cartesian"),
+  kind: z.enum(["cartesian", "space"]),
   title: z.string().max(100),
   xLabel: z.string().max(20).default("x"),
   yLabel: z.string().max(20).default("y"),
   xDomain: z.tuple([z.number(), z.number()]),
   yDomain: z.tuple([z.number(), z.number()]).optional(),
+  zDomain: spatialRange.optional(),
   parameters: z.array(graphParameterSchema).max(4).default([]),
   interactiveParameters: z.array(interactiveParameterSchema).max(4).optional(),
   layers: z.array(graphLayerSchema).min(1).max(10),
+}).superRefine((spec, ctx) => {
+  const spatial = spec.kind === "space";
+  const issue = (path: (string | number)[], message: string) => ctx.addIssue({ code: z.ZodIssueCode.custom, path, message });
+  if (spatial) {
+    if (!spatialRange.safeParse(spec.xDomain).success || !spatialRange.safeParse(spec.yDomain).success) issue(["xDomain"], "三维图需要有限且递增的 x、y 范围");
+    if (spec.parameters.length) issue(["parameters"], "三维图首版仅支持固定边界");
+    if (spec.layers.length > 6) issue(["layers"], "三维图最多6层");
+  }
+  spec.layers.forEach((layer, index) => {
+    const is3d = layer.type === "surface" || layer.type === "solid";
+    if (spatial !== is3d || (layer.type === "surface" && !layer.expression?.trim()) || (layer.type === "solid" && !layer.zBounds)) {
+      issue(["layers", index], "图层与坐标维度不匹配，或缺少曲面表达式/立体边界");
+    }
+    if (is3d && layer.domain && !spatialRange.safeParse(layer.domain).success) issue(["layers", index, "domain"], "三维采样区间必须有限且递增");
+  });
 });
 export type VisualizationSpec = z.infer<typeof visualizationSpecSchema>;
 
@@ -132,6 +152,10 @@ export const solutionStepSchema = z.object({
   id: z.string().min(1).max(40),
   title: z.string().min(1).max(80),
   explanation: z.string().min(1).max(1200),
+  summary: z.string().max(240).optional(),
+  goal: z.string().max(240).optional(),
+  conditions: z.array(z.string().max(240)).max(6).optional(),
+  verification: z.string().max(400).optional(),
   formulas: z.array(z.string().max(400)).max(5).default([]),
   basis: z.string().max(240).default(""),
   commonMistake: z.string().max(300).optional(),

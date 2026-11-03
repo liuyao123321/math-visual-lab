@@ -6,3 +6,8 @@ declare module "plotly.js-basic-dist-min" {
   };
   export default Plotly;
 }
+
+declare module "plotly.js-gl3d-dist-min" {
+  import Plotly from "plotly.js-basic-dist-min";
+  export default Plotly;
+}

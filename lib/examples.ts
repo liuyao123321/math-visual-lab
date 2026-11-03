@@ -74,6 +74,28 @@ export const examples: SolveResult[] = [
       ],
     },
   },
+  {
+    id: "example-triple-integral",
+    normalizedQuestion: "求第一卦限内由平面 x+y+z=1 与三个坐标平面围成的四面体体积，并用三维图解释三重积分上下限。",
+    subject: "高等数学", questionType: "三重积分与体积", topics: ["三重积分", "积分区域", "空间立体"], difficulty: "中等", status: "solved",
+    recommendedMode: "visual", explanationMode: "visual",
+    modeReason: "空间边界与三重积分上下限可以逐步对应。",
+    steps: [
+      { id: "v1", title: "确定底面投影", explanation: "先在 xy 平面上看立体的影子：x 和 y 均非负，且 x+y 不超过 1。固定 x 后，沿 y 方向从 0 走到斜边。", formulas: ["0\\le x\\le 1,\\qquad 0\\le y\\le 1-x"], basis: "向 xy 平面投影", visualLayerIds: ["projection"] },
+      { id: "v2", title: "确定竖直边界", explanation: "固定底面上一点 (x,y)，竖直线段从 z=0 出发，在斜平面处结束。图中可以旋转观察底面和斜面。", formulas: ["0\\le z\\le 1-x-y"], basis: "由平面方程解出 z", visualLayerIds: ["projection", "roof"] },
+      { id: "v3", title: "计算体积", explanation: "先沿 z 累加得到竖直线段的长度，再对底面累加。先积 y 会得到 (1-x)²/2，最后对 x 积分。", formulas: ["V=\\int_0^1\\int_0^{1-x}\\int_0^{1-x-y}1\\,dz\\,dy\\,dx", "V=\\int_0^1\\frac{(1-x)^2}{2}\\,dx=\\frac16"], basis: "三重积分的几何意义", visualLayerIds: ["solid"] },
+    ],
+    finalAnswerLatex: "V=\\frac{1}{6}",
+    commonMistakes: ["把三角形底面误写成单位正方形", "忘记内层 z 的上限同时依赖 x 和 y"], limitations: [],
+    visualization: {
+      kind: "space", title: "第一卦限四面体", xLabel: "x", yLabel: "y", xDomain: [0, 1], yDomain: [0, 1], zDomain: [0, 1], parameters: [],
+      layers: [
+        { id: "projection", label: "底面投影 z=0", type: "surface", expression: "0", yBounds: ["0", "1-x"], color: "#6366b8" },
+        { id: "roof", label: "上边界 z=1-x-y", type: "surface", expression: "1-x-y", yBounds: ["0", "1-x"], color: "#df892d" },
+        { id: "solid", label: "四面体积分区域", type: "solid", yBounds: ["0", "1-x"], zBounds: ["0", "1-x-y"], color: "#30866b" },
+      ],
+    },
+  },
 ];
 
 export const exampleById = Object.fromEntries(examples.map((example) => [example.id, example])) as Record<string, SolveResult>;

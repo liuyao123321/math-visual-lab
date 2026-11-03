@@ -4,6 +4,7 @@ import hostingConfig from "./.openai/hosting.json";
 import { readExecutionProfile } from "./scripts/execution-profile.mjs";
 import { sites } from "./build/sites-vite-plugin";
 import { developmentWatchOptions } from "./scripts/dev-watch.mjs";
+import { fileURLToPath } from "node:url";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
@@ -63,6 +64,7 @@ export default defineConfig(async ({ command }) => {
   ];
 
   return {
+    resolve: { alias: { "@operations-store": fileURLToPath(new URL(windowsNodeDev ? "./lib/operations/store.node.ts" : "./lib/operations/store.d1.ts", import.meta.url)) } },
     server: {
       // The desktop launcher opens a fixed URL; never silently switch ports.
       ...(process.env.MATHLAB_LAUNCHER === "1" ? { strictPort: true } : {}),

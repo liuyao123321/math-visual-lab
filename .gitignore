@@ -49,6 +49,7 @@ next-env.d.ts
 /.local-server/
 # Generated from the pinned pdfjs-dist package before dev/build.
 /public/vendor/pdf.worker.min.mjs
+/public/vendor/ocr/
 /.rag-runtime/
 /.taste-skill/
 /site-deploy*.tgz

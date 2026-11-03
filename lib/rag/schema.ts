@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publishedCardMetadata, cardContentLength, MAX_CARD_CONTENT } from "../textbook-cards";
 
 const id = z.string().min(1).max(80);
 const webSourceSchema = z.object({
@@ -9,14 +10,21 @@ const webSourceSchema = z.object({
 export const localTextbookIdSchema = z.string().regex(/^local-pdf-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 export const knowledgeSourceSchema = z.union([webSourceSchema, z.object({
   kind: z.literal("local_pdf"), title: z.string().min(1).max(180), section: z.string().min(1).max(150),
-  fileName: z.string().min(1).max(200), pageNumber: z.number().int().min(1).max(10000), textbookId: localTextbookIdSchema,
+  fileName: z.string().min(1).max(200), pageNumber: z.number().int().min(1).safe(), textbookId: localTextbookIdSchema,
+  pageEnd: z.number().int().positive().safe().optional(),
+  category: publishedCardMetadata.innerType().shape.category.optional(),
+  cardVersion: z.literal(1).optional(),
   url: z.undefined().optional(),
 })]);
 export const personalExcerptSchema = z.object({
   id: z.string().min(1).max(80), textbookId: localTextbookIdSchema,
-  title: z.string().min(1).max(180), fileName: z.string().min(1).max(200), pageNumber: z.number().int().min(1).max(10000),
+  title: z.string().min(1).max(180), fileName: z.string().min(1).max(200), pageNumber: z.number().int().min(1).safe(),
   text: z.string().trim().min(20).max(1200),
-}).refine((value) => value.id.startsWith(value.textbookId + ":"), "摘录编号必须属于对应个人教材");
+  structured: publishedCardMetadata.optional(),
+}).refine((value) => value.id.startsWith(value.textbookId + ":"), "摘录编号必须属于对应个人教材")
+  .refine((value) => !value.structured || (value.structured.pageEnd >= value.pageNumber &&
+    /^c\d{1,6}:v1$/.test(value.id.slice(value.textbookId.length + 1)) &&
+    cardContentLength(value.text, value.structured) <= MAX_CARD_CONTENT), "结构化卡片来源或内容长度无效");
 export const personalExcerptsSchema = z.array(personalExcerptSchema).max(4).refine((items) => new Set(items.map((item) => item.id)).size === items.length, "摘录编号重复");
 export type PersonalExcerpt = z.infer<typeof personalExcerptSchema>;
 export const knowledgeCardSchema = z.object({

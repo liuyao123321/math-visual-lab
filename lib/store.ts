@@ -5,6 +5,7 @@ import type { LearnerProfile, Mastery, MistakeRecord, SolveResult, Understanding
 import { defaultLearnerProfile, defaultSettings, readMistakes, readSettings, readUnderstandingAttempts, writeMistakes, writeSettings, writeUnderstandingAttempts } from "@/lib/storage";
 import { useLearningStore } from "@/lib/learning-store";
 import type { HandwritingSession } from "@/lib/handwriting-session";
+import { trackUsage } from "@/lib/usage-client";
 
 type AddMistakeInput = {
   solution: SolveResult;
@@ -64,6 +65,7 @@ export const useMathLabStore = create<MathLabState>((set, get) => ({
     const next = [record, ...get().mistakes];
     writeMistakes(next);
     set({ mistakes: next });
+    trackUsage("mistake_saved", "/mistakes");
     return record;
   },
   updateMistake: (id, patch) => {

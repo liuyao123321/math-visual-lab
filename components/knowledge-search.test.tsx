@@ -10,6 +10,32 @@ const snapshot: RagSnapshot = { version: 1, knowledgeBaseVersion: "test-fixture"
 beforeEach(() => localStorage.clear());
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 describe("independent textbook search", () => {
+  it("places upload before materials and keeps the conversation composer last", () => {
+    savePersonalBook(personalBook);
+    render(<KnowledgeSearch />);
+    const main = screen.getByRole("main");
+    const upload = screen.getByRole("region", { name: "上传PDF教材" });
+    const library = screen.getByRole("region", { name: "我的PDF教材" });
+    const conversation = screen.getByRole("region", { name: "教材检索对话" });
+    const composer = screen.getByRole("form", { name: "教材知识检索" });
+    expect(upload.compareDocumentPosition(library) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(library.compareDocumentPosition(conversation) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(conversation.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(main.lastElementChild).toBe(composer);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+  it("submits with Ctrl+Enter and shows the question and evidence above the composer", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ data: snapshot }))));
+    render(<KnowledgeSearch />);
+    const input = screen.getByLabelText("检索课程知识的问题");
+    fireEvent.change(input, { target: { value: "导数的定义是什么？" } });
+    fireEvent.keyDown(input, { key: "Enter", ctrlKey: true });
+    await screen.findByText("测试情境：未覆盖该知识");
+    expect(screen.getByRole("region", { name: "教材检索对话" })).toHaveTextContent("导数的定义是什么？");
+    expect(screen.getByRole("region", { name: "教材检索对话" })).toHaveTextContent("知识检索结果");
+    expect(input).toHaveValue("导数的定义是什么？");
+    expect(screen.getByRole("main").lastElementChild).toBe(screen.getByRole("form", { name: "教材知识检索" }));
+  });
   it("keeps personal matches available when all-materials public search fails", async () => {
     savePersonalBook(personalBook);
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));

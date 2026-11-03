@@ -11,8 +11,8 @@ export function compileSafeExpression(expression: string, allowedVariables: stri
     throw new Error("表达式包含不支持的内容");
   }
   const compiled = compile(expression);
-  return (scope: Record<string, number>) => {
-    const value = compiled.evaluate(scope);
+  return (scope: Record<string, number>, sqrtOverride?: (value: number) => number) => {
+    const value = compiled.evaluate(sqrtOverride ? { ...scope, sqrt: sqrtOverride } : scope);
     if (typeof value !== "number" || !Number.isFinite(value)) return null;
     return value;
   };

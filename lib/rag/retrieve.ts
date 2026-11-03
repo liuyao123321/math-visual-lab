@@ -110,7 +110,7 @@ export async function retrieveKnowledge(query: string, options: RetrievalOptions
   const started = Date.now();
   const base = await retrieveCourseKnowledge(query, options);
   if (!options.personalExcerpts?.length) return base;
-  const snapshot = mergePersonalEvidence(base.snapshot, query, options.personalExcerpts, options.textbookIds);
+  const snapshot = mergePersonalEvidence(base.snapshot, query, options.personalExcerpts.filter((item) => item.structured?.category !== "exercise"), options.textbookIds);
   snapshot.retrievalMs = Date.now() - started;
   return { snapshot, ranking: snapshot.cards.map((card, index) => ({ id: card.id, score: 1 / (index + 1) })) };
 }
