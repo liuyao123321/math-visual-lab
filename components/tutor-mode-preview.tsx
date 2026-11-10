@@ -51,7 +51,7 @@ export function TutorModePreview({ mode }: { mode: ExplanationMode }) {
   useEffect(() => { timeline.current?.paused(paused); }, [paused]);
 
   return <section ref={root} className="tutor-preview" aria-label={`${item.label}演示`} data-preview-mode={mode} data-reduced-motion={reduced ? "true" : "false"}>
-    <div className="tutor-preview-heading"><span>{item.label}</span><span className="tutor-preview-demo-note">交互示意</span></div>
+<div className="tutor-preview-heading"><span>{item.label}</span></div>  
     <div className="tutor-preview-question"><span>求零点与顶点</span><MathFormula value={String.raw`f(x)=x^2-4x+3`} block={false} /></div>
     <div className="tutor-preview-scene" data-preview-scene key={mode}>
       {mode === "concise" && <div className="tutor-preview-concise">
